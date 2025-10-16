@@ -1,7 +1,5 @@
 package ru.kuzdikenov.entity;
 
-import ru.kuzdikenov.exception.UserRole;
-
 import java.time.Instant;
 
 public class User {

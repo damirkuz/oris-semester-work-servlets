@@ -4,8 +4,8 @@ import java.time.Instant;
 
 public class Comment {
     private int id;
-    private int writerUserId;
+    private int authorUserId;
     private int initiativeId;
-    private String message;
+    private String body;
     private Instant createdAt;
 }

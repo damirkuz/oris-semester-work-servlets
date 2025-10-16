@@ -4,6 +4,6 @@ import java.time.Instant;
 
 public class Image {
     private int id;
-    private int uploadedUserId;
-    private Instant uploadedAt;
+    private int uploaderUserId;
+    private Instant createdAt;
 }

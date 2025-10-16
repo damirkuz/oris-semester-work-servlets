@@ -1,4 +1,4 @@
-package ru.kuzdikenov.exception;
+package ru.kuzdikenov.entity;
 
 public enum UserRole {
     USER,
