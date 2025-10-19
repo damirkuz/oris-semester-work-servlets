@@ -1,0 +1,269 @@
+
+* { box-sizing: border-box; }
+body { background: #eaf6fb; margin: 0; }
+
+/* buttons */
+button, .btn-like, .btn-edit, a.new-initiative-btn {
+    display: inline-block;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* ===== forms: registration / login ===== */
+.register-card,
+.login-card {
+    max-width: 400px;
+    margin: 40px auto;
+    background: #fff;
+    border: 1px solid #90caf9;
+    border-radius: 8px;
+    padding: 32px;
+}
+
+.register-title,
+.login-title {
+    color: #1976d2;
+    text-align: center;
+    margin: 0 0 24px;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+label {
+    color: #1976d2;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.input-blue,
+.comment-input {
+    border: 1px solid #1976d2;
+    border-radius: 6px;
+    padding: 8px;
+    width: 100%;
+}
+
+.submit-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    width: 100%;
+    margin-top: 8px;
+}
+.submit-btn:hover { background: #1565c0; }
+.submit-btn:disabled {
+    background: darkgrey;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-size: 0.95em;
+    margin-top: 4px;
+    min-height: 18px;
+}
+
+/* ===== Initiative Feed ===== */
+
+.feed-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 16px;
+}
+
+/* feed header */
+.feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.feed-title {
+    color: #1976d2;
+    margin: 0;
+    text-align: center;
+    flex: 1;
+}
+
+/* publish button */
+a.new-initiative-btn {
+    background: #1976d2;
+    color: #fff !important;
+    padding: 10px 20px;
+    white-space: nowrap;
+}
+a.new-initiative-btn:hover { background: #1565c0; text-decoration: none; }
+
+/* initiatives list */
+.initiatives-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+/* initiative card */
+.initiative-card {
+    background: #fff;
+    border: 1px solid #90caf9;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(25,118,210,0.06);
+}
+
+.initiative-title {
+    color: #1976d2;
+    text-align: center;
+    margin: 0 0 8px;
+}
+
+.initiative-description { margin: 0 0 12px; }
+
+.initiative-photo {
+    display: block;
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 8px auto 12px;
+}
+
+
+.initiative-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0 14px;
+}
+
+/* Кнопки действий */
+.like-btn, .btn-like {
+    background: #1976d2;
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 16px;
+}
+.like-btn:hover, .btn-like:hover { background: #1565c0; }
+
+.edit-btn, .btn-edit {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 6px;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+.edit-btn:hover, .btn-edit:hover { background: #d6ecff; }
+
+/* Комментарии */
+.comments { margin-top: 16px; }
+
+.comments-title {
+    margin: 10px 0 8px;
+    color: #1976d2;
+    text-align: center;
+}
+
+.comment {
+    background: #eaf4ff;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+}
+
+.comment-empty {
+    color: #6b7280;
+    background: #f3f6fb;
+}
+
+.comment-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.comment-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+.comment-btn:hover { background: #1565c0; }
+
+/* empty feed */
+.empty-feed {
+    text-align: center;
+    color: #6b7280;
+    margin-top: 24px;
+}
+
+
+/* ===== header ===== */
+.site-header {
+    background-color: #1976d2;
+    color: #fff;
+    padding: 12px 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-left a.header-logo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+}
+
+.header-left a.header-logo:hover {
+    text-decoration: underline;
+}
+
+.header-right {
+    display: flex;
+    gap: 12px;
+}
+
+.header-btn {
+    background: #fff;
+    color: #1976d2;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background 0.2s ease-in-out, transform 0.1s;
+}
+
+.header-btn:hover {
+    background: #e3f2fd;
+    transform: translateY(-1px);
+}
+
+.header-btn-outline {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+.header-btn-outline:hover {
+    background: #1565c0;
+    border-color: #bbdefb;
+}

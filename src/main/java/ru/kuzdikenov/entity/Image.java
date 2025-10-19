@@ -1,13 +1,14 @@
 package ru.kuzdikenov.entity;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public class Image {
-    private String id;
+    private UUID id;
     private int uploaderUserId;
     private Instant createdAt;
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
