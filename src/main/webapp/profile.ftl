@@ -1,0 +1,114 @@
+<#include "base.ftl">
+
+<#macro title>Личный кабинет</#macro>
+
+<#macro content>
+    <div class="profile-container">
+
+        <h1 class="profile-title">Личный кабинет</h1>
+
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <#if userProfile.profilePicture?? && userProfile.profilePicture?has_content>
+                    <img src="${userProfile.profilePicture}" alt="Аватар пользователя" class="avatar-img" />
+                <#else>
+                    <img src="/static/images/default-avatar.png" alt="Стандартный аватар" class="avatar-img" />
+                </#if>
+            </div>
+
+            <div class="profile-info">
+                <p><strong>Логин:</strong> ${userProfile.login}</p>
+                <p><strong>Имя:</strong> ${userProfile.name}</p>
+            </div>
+        </div>
+
+        <#if isSelfUserProfile?? && isSelfUserProfile>
+            <div class="profile-edit-form">
+                <h2>Редактировать профиль</h2>
+                <form action="/profile/${userProfile.login}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Новое имя</label>
+                        <input type="text" id="name" name="name" class="input-blue" value="${userProfile.name!}" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Новый пароль</label>
+                        <input type="password" id="password" name="password" class="input-blue" />
+                        <small>Оставьте поле пустым, если не хотите менять пароль</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="avatar">Загрузить новый аватар</label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" />
+                    </div>
+
+                    <#if error?? && error?has_content>
+                        <div id="login-error" class="error-message">${error}</div>
+                    </#if>
+
+                    <button type="submit" class="submit-btn">Сохранить изменения</button>
+                </form>
+            </div>
+
+            <#if (RequestParameters.error??)>
+                <div class="error-message">
+                    <#if RequestParameters.error == "invalidPassword">Пароль не соответствует требованиям</#if>
+                    <#if RequestParameters.error == "noChanges">Изменений не обнаружено</#if>
+                </div>
+            </#if>
+
+            <#if (RequestParameters.success??)>
+                <div class="success-message">Профиль успешно обновлен</div>
+            </#if>
+
+        </#if>
+
+
+        <script>
+            // format registration date with user timeZone
+            document.addEventListener("DOMContentLoaded", function() {
+                const registrationDateElem = document.getElementById('registration-date');
+                const rawDateStr = registrationDateElem.textContent;
+                if (rawDateStr) {
+                    const date = new Date(rawDateStr);
+                    const formattedDate = date.toLocaleString('ru-RU', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    registrationDateElem.textContent = formattedDate;
+                }
+            });
+        </script>
+
+        <div class="profile-stats">
+            <h2>Статистика пользователя</h2>
+            <ul>
+                <li><strong>Дата регистрации:</strong>
+                    <span id="registration-date">${userProfile.registrationDate!}</span>
+                </li>
+                <li><strong>Количество инициатив:</strong> ${userProfile.initiativesCount}</li>
+                <li><strong>Завершённых проектов:</strong> ${userProfile.completedProjects}</li>
+            </ul>
+        </div>
+
+        <div class="user-posts">
+            <h2>Мои публикации</h2>
+            <#if userProfile.posts?? && userProfile.posts?has_content>
+                <#list userProfile.posts as post>
+                    <div class="post-card">
+                        <h3 class="post-title">${post.title}</h3>
+                        <p class="post-content">${post.content}</p>
+                        <p class="post-date">Опубликовано: ${post.publishedDate}</p>
+                    </div>
+                </#list>
+            <#else>
+                <p>Публикаций пока нет.</p>
+            </#if>
+        </div>
+
+    </div>
+</#macro>

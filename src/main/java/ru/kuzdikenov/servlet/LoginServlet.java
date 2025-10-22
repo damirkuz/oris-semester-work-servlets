@@ -34,9 +34,13 @@ public class LoginServlet extends HttpServlet {
             // logic to authenticate user
             // make session
             HttpSession httpSession = req.getSession();
+            httpSession.setAttribute("userLoggedIn", true);
             httpSession.setAttribute("login", login);
             req.setAttribute("userLoggedIn", true);
+            req.setAttribute("userLogin", login);
+
             httpSession.setMaxInactiveInterval(DefaultSettings.httpSessionMaxInactiveInterval);
+
 
             req.getRequestDispatcher("index.ftl").forward(req, resp);
         } else {

@@ -5,6 +5,6 @@ public class UserAlreadyExistsInDatabase extends Exception {
         super(message);
     }
     public UserAlreadyExistsInDatabase() {
-        super();
+        super("Пользователь уже существует");
     }
 }

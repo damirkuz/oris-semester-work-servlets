@@ -22,7 +22,7 @@
             <div class="header-right">
                 <#-- by default — buttons login and signUp -->
                 <#if userLoggedIn?? && userLoggedIn>
-                    <a href="/profile" class="header-btn">Личный кабинет</a>
+                    <a href="/profile/${userLogin}" class="header-btn">Личный кабинет</a>
                     <a href="/logout" class="header-btn header-btn-outline">Выйти</a>
                 <#else>
                     <a href="/login" class="header-btn">Вход</a>
