@@ -1,12 +1,13 @@
 package ru.kuzdikenov.repository.impl;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.entity.User;
 import ru.kuzdikenov.entity.UserRole;
-import ru.kuzdikenov.exception.UserAlreadyExistsInDatabase;
-import ru.kuzdikenov.exception.UserNotFoundInDatabase;
-import ru.kuzdikenov.helper.DatabaseConnectionUtil;
+import ru.kuzdikenov.exception.UserAlreadyExistsInDatabaseException;
+import ru.kuzdikenov.exception.UserNotFoundInDatabaseException;
+import ru.kuzdikenov.helper.DatabaseUtil;
 import ru.kuzdikenov.repository.UserRepository;
 
 import java.sql.Connection;
@@ -17,14 +18,16 @@ import java.util.UUID;
 
 public class UserRepositoryImpl implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(UserRepositoryImpl.class);
-    private final Connection connection = DatabaseConnectionUtil.getConnection();
+    private final HikariDataSource dataSource = DatabaseUtil.createDataSource();
+
 
     @Override
-    public void save(User user) throws UserAlreadyExistsInDatabase {
+    public void save(User user) throws UserAlreadyExistsInDatabaseException {
         log.atInfo().log("Сохраняю пользователя с логином" + user.getLogin());
         String sql = "insert into forum.users (name, login, password_hash, profile_picture_id, user_role) values (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getLogin());
             preparedStatement.setString(3, user.getPasswordHash());
@@ -35,21 +38,22 @@ public class UserRepositoryImpl implements UserRepository {
             log.atInfo().log("Пользователь с логином" + user.getLogin() + " сохранён");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new UserAlreadyExistsInDatabase();
+            throw new UserAlreadyExistsInDatabaseException();
         }
     }
 
     @Override
-    public User getByLogin(String login) throws UserNotFoundInDatabase {
-        log.atInfo().log("Получаем пользователя по логину");
+    public User getByLogin(String login) throws UserNotFoundInDatabaseException {
+        log.atInfo().log("Получаем пользователя по логину " + login);
         String sql = "SELECT * FROM forum.users WHERE login = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, login);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return getUserFromResultSet(rs);
                 } else {
-                    throw new UserNotFoundInDatabase("Пользователь с логином " + login + " не найден");
+                    throw new UserNotFoundInDatabaseException("Пользователь с логином " + login + " не найден");
                 }
             }
         } catch (SQLException e) {
@@ -57,9 +61,29 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+    @Override
+    public User getById(int userId) throws UserNotFoundInDatabaseException {
+        log.atInfo().log("Получаем пользователя по id " + userId);
+        String sql = "SELECT * FROM forum.users WHERE id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return getUserFromResultSet(rs);
+                } else {
+                    throw new UserNotFoundInDatabaseException("Пользователь с id " + userId + " не найден");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при поиске пользователя по id: " + userId, e);
+        }
+    }
+
     private void updateOneColumnValue(User user, String columnName, Object value, boolean isStringParameter) {
         String sql = "UPDATE forum.users SET " + columnName + " = ? WHERE login = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             if (isStringParameter) {
                 ps.setString(1, (String) value);
             } else {
@@ -105,7 +129,8 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(User user) {
         String sql = "DELETE FROM forum.users WHERE login = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getLogin());
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {

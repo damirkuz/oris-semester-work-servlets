@@ -14,6 +14,37 @@ public class Initiative {
     private List<Comment> comments;
     private Instant createdAt;
 
+    public Initiative(int creatorUserId, String title, String body, InitiativeStatus status, List<Image> images, List<Like> likes, List<Comment> comments) {
+        this.creatorUserId = creatorUserId;
+        this.title = title;
+        this.body = body;
+        this.status = status;
+        this.images = images;
+        this.likes = likes;
+        this.comments = comments;
+    }
+
+    public Initiative(int initiativeId, int creatorUserId, String title, String body, InitiativeStatus status, List<Image> images, List<Like> likes, List<Comment> comments, Instant createdAt) {
+        this.initiativeId = initiativeId;
+        this.creatorUserId = creatorUserId;
+        this.title = title;
+        this.body = body;
+        this.status = status;
+        this.images = images;
+        this.likes = likes;
+        this.comments = comments;
+        this.createdAt = createdAt;
+    }
+
+    public Initiative(int initiativeId, int creatorUserId, String title, String body, InitiativeStatus status, Instant createdAt) {
+        this.initiativeId = initiativeId;
+        this.creatorUserId = creatorUserId;
+        this.title = title;
+        this.body = body;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
     public int getInitiativeId() {
         return initiativeId;
     }

@@ -6,7 +6,7 @@
     <div class="feed-container">
         <header class="feed-header">
             <h1 class="feed-title">Лента инициатив</h1>
-            <a href="/initiative/new" class="new-initiative-btn">Опубликовать инициативу</a>
+            <a href="/new-initiative" class="new-initiative-btn">Опубликовать инициативу</a>
         </header>
 
         <#if initiatives?? && initiatives?has_content>

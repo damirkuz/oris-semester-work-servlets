@@ -3,7 +3,9 @@ package ru.kuzdikenov.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.app.DefaultSettings;
-import ru.kuzdikenov.exception.UserNotFoundInDatabase;
+import ru.kuzdikenov.entity.Image;
+import ru.kuzdikenov.exception.ImageNotFoundInDatabaseException;
+import ru.kuzdikenov.exception.UserNotFoundInDatabaseException;
 import ru.kuzdikenov.helper.ImageUtil;
 import ru.kuzdikenov.repository.ImageRepository;
 import ru.kuzdikenov.repository.UserRepository;
@@ -29,10 +31,21 @@ public class ImageServiceImpl implements ImageService {
         int uploaderId;
         try {
             uploaderId = userRepository.getByLogin(uploaderLogin).getId();
-        } catch (UserNotFoundInDatabase e) {
+        } catch (UserNotFoundInDatabaseException e) {
             throw new RuntimeException(e);
         }
 
         imageRepository.save(uuid, uploaderId, path);
     }
+
+    @Override
+    public Image getByUuid(UUID uuid) {
+        try {
+            return imageRepository.getByUuid(uuid);
+        } catch (ImageNotFoundInDatabaseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

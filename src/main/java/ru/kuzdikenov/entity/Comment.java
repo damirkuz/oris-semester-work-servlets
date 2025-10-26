@@ -9,6 +9,14 @@ public class Comment {
     private String body;
     private Instant createdAt;
 
+    public Comment(int id, int authorUserId, int initiativeId, String body, Instant createdAt) {
+        this.id = id;
+        this.authorUserId = authorUserId;
+        this.initiativeId = initiativeId;
+        this.body = body;
+        this.createdAt = createdAt;
+    }
+
     public int getId() {
         return id;
     }

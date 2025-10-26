@@ -3,12 +3,17 @@ package ru.kuzdikenov.repository;
 import ru.kuzdikenov.entity.Initiative;
 import ru.kuzdikenov.entity.InitiativeStatus;
 import ru.kuzdikenov.entity.User;
+import ru.kuzdikenov.exception.FailInitiativeSaveException;
+import ru.kuzdikenov.exception.InitiativeNotFoundInDatabaseException;
 
 import java.util.List;
 
 public interface InitiativeRepository {
-    void save(Initiative initiative);
+    int save(Initiative initiative) throws FailInitiativeSaveException;
     List<Initiative> getAllFromUser(User user);
     void delete(Initiative initiative);
-    void edit(Initiative initiative);
+    Initiative getById(int initiativeId) throws InitiativeNotFoundInDatabaseException;
+    void changeTitle(Initiative initiative, String newTitle);
+    void changeBody(Initiative initiative, String newBody);
+    void changeStatus(Initiative initiative, InitiativeStatus initiativeStatus);
 }

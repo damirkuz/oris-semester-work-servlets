@@ -4,10 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.dto.UserProfile;
 import ru.kuzdikenov.dto.UuidAndLoginAndPath;
-import ru.kuzdikenov.exception.InvalidPasswordException;
-import ru.kuzdikenov.exception.NoChangesException;
-import ru.kuzdikenov.exception.UserNotFoundInDatabase;
+import ru.kuzdikenov.exception.*;
 import ru.kuzdikenov.helper.ImageUtil;
+import ru.kuzdikenov.helper.UrlUtil;
 import ru.kuzdikenov.service.ImageService;
 import ru.kuzdikenov.service.UserService;
 
@@ -18,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @MultipartConfig
@@ -38,7 +38,7 @@ public class UserProfileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String userLogin = getUserLoginFromPath(req, resp);
+        String userLogin = UrlUtil.getUrlAfterSlash(req, resp);
 
         if (userLogin == null) {
             return; // go to 404
@@ -56,27 +56,17 @@ public class UserProfileServlet extends HttpServlet {
             req.setAttribute("isSelfUserProfile", isSelfUserProfile);
 
             req.getRequestDispatcher("/profile.ftl").forward(req, resp);
-        } catch (UserNotFoundInDatabase e) {
+        } catch (UserNotFoundInDatabaseException e) {
             log.atError().log(e.getMessage());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
     }
 
-    private String getUserLoginFromPath(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String path = req.getPathInfo();
-        if (path == null || path.equals("/")) {
-            log.atError().log("Не указан пользователь");
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return null;
-        }
-        return path.substring(1);
-    }
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.atInfo().log("Получаем логин пользователя из строки");
-        String userLogin = getUserLoginFromPath(req, resp);
+        String userLogin = UrlUtil.getUrlAfterSlash(req, resp);
 
         if (userLogin == null) {
             return; // go to 404
@@ -94,16 +84,22 @@ public class UserProfileServlet extends HttpServlet {
         String name = req.getParameter("name");
         String password = req.getParameter("password");
 
-        UUID imageUuid;
+        UUID imageUuid = null;
         try {
             // save image from form to server
-            UuidAndLoginAndPath res = ImageUtil.parseAndSave(req, "avatar");
-            // save image path to db
-            imageService.save(res.uuid(), res.login(), res.path());
-            imageUuid = res.uuid();
-        } catch (IOException e) {
+            List<UuidAndLoginAndPath> resList = ImageUtil.handlePhotos(req, "avatar");
+            if (resList.size() == 1) {
+                UuidAndLoginAndPath res = resList.getFirst();
+                // save image path to db
+                imageService.save(res.uuid(), res.login(), res.path());
+                imageUuid = res.uuid();
+            }
+        } catch (IOException | InvalidImageExtensionException e) {
             // the user didn't send the image
-            imageUuid = null;
+        } catch (InvalidImageSizeException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidImageNameException e) {
+            throw new RuntimeException(e);
         }
 
         try {
@@ -116,7 +112,7 @@ public class UserProfileServlet extends HttpServlet {
         } catch (NoChangesException e) {
             log.atError().log("Профиль не изменён");
             resp.sendRedirect(req.getContextPath() + "/profile/" + userLogin + "?error=noChanges");
-        } catch (UserNotFoundInDatabase e) {
+        } catch (UserNotFoundInDatabaseException e) {
             log.atError().log(e.getMessage());
             throw new RuntimeException(e);
         }

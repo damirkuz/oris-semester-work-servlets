@@ -7,7 +7,6 @@ import ru.kuzdikenov.dto.UserProfile;
 import ru.kuzdikenov.entity.Initiative;
 import ru.kuzdikenov.entity.User;
 import ru.kuzdikenov.exception.*;
-import ru.kuzdikenov.helper.ImageUtil;
 import ru.kuzdikenov.helper.LoginPasswordUtil;
 import ru.kuzdikenov.repository.ImageRepository;
 import ru.kuzdikenov.repository.UserRepository;
@@ -28,7 +27,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void signUp(String name, String login, String password) throws UserAlreadyExistsInDatabase, InvalidPasswordException, InvalidLoginException {
+    public void signUp(String name, String login, String password) throws UserAlreadyExistsInDatabaseException, InvalidPasswordException, InvalidLoginException {
         if (!LoginPasswordUtil.isValidLogin(login)) {
             throw new InvalidLoginException();
         }
@@ -45,7 +44,7 @@ public class UserServiceImpl implements UserService {
         User user;
         try {
             user = userRepository.getByLogin(login);
-        } catch (UserNotFoundInDatabase e) {
+        } catch (UserNotFoundInDatabaseException e) {
             // user isn't found -> login or pass is wrong
             return false;
         }
@@ -58,7 +57,7 @@ public class UserServiceImpl implements UserService {
         User user;
         try {
             user = userRepository.getByLogin(login);
-        } catch (UserNotFoundInDatabase e) {
+        } catch (UserNotFoundInDatabaseException e) {
             // user isn't found -> login or pass is wrong
             return false;
         }
@@ -67,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfile getUserProfile(String login) throws UserNotFoundInDatabase{
+    public UserProfile getUserProfile(String login) throws UserNotFoundInDatabaseException {
         User user = userRepository.getByLogin(login);
 
         // the registration date will be formatted with JavaScript
@@ -76,7 +75,7 @@ public class UserServiceImpl implements UserService {
         if (user.getProfilePictureId() != null) {
             try {
                 imagePath = imageRepository.getByUuid(user.getProfilePictureId()).getPath();
-            } catch (ImageNotFoundInDatabase e) {
+            } catch (ImageNotFoundInDatabaseException e) {
                 throw new RuntimeException(e);
             }
 
@@ -92,11 +91,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editProfile(String login, String name, String password, UUID profilePicture) throws InvalidPasswordException, UserNotFoundInDatabase, NoChangesException {
+    public void editProfile(String login, String name, String password, UUID profilePicture) throws InvalidPasswordException, UserNotFoundInDatabaseException, NoChangesException {
         int changesCount = 0;
         User user = userRepository.getByLogin(login);
 
-        // TODO: реализовать методы в userRepository
         log.atInfo().log("Проверяем новое имя на совпадение со старым");
         if (!name.equals(user.getName())) {
             userRepository.changeName(user, name);
@@ -125,6 +123,11 @@ public class UserServiceImpl implements UserService {
         if (changesCount == 0) {
             throw new NoChangesException();
         }
+    }
+
+    @Override
+    public User getById(int userId) throws UserNotFoundInDatabaseException {
+        return userRepository.getById(userId);
     }
 
 

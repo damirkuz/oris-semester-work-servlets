@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.exception.InvalidLoginException;
 import ru.kuzdikenov.exception.InvalidPasswordException;
-import ru.kuzdikenov.exception.UserAlreadyExistsInDatabase;
+import ru.kuzdikenov.exception.UserAlreadyExistsInDatabaseException;
 import ru.kuzdikenov.service.UserService;
 
 import javax.servlet.ServletException;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(name = "SignUp", urlPatterns = "/signUp")
-public class SignUpServlet extends HttpServlet {
+public class  SignUpServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(SignUpServlet.class);
     public static UserService userService;
@@ -42,7 +42,7 @@ public class SignUpServlet extends HttpServlet {
         try {
             userService.signUp(name, login, password);
             resp.sendRedirect("/login");
-        } catch (InvalidLoginException | InvalidPasswordException | UserAlreadyExistsInDatabase  e) {
+        } catch (InvalidLoginException | InvalidPasswordException | UserAlreadyExistsInDatabaseException e) {
             log.atError().log(e.getMessage());
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/signUp.ftl").forward(req, resp);

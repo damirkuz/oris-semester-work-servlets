@@ -2,7 +2,7 @@ package ru.kuzdikenov.repository;
 
 import ru.kuzdikenov.entity.Image;
 import ru.kuzdikenov.entity.Initiative;
-import ru.kuzdikenov.exception.ImageNotFoundInDatabase;
+import ru.kuzdikenov.exception.ImageNotFoundInDatabaseException;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,5 +12,5 @@ public interface ImageRepository {
     List<Image> getAllImagesFromInitiative(Initiative initiative);
 //    Image getById(int imageId);
     void delete(int imageId);
-    Image getByUuid(UUID uuid) throws ImageNotFoundInDatabase;
+    Image getByUuid(UUID uuid) throws ImageNotFoundInDatabaseException;
 }

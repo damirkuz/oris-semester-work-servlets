@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.app.DefaultSettings;
 import ru.kuzdikenov.dto.UuidAndLoginAndPath;
+import ru.kuzdikenov.exception.InvalidImageExtensionException;
+import ru.kuzdikenov.exception.InvalidImageNameException;
+import ru.kuzdikenov.exception.InvalidImageSizeException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -11,14 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.UUID;
+import java.util.*;
 
 @MultipartConfig
 public class ImageUtil {
     public static final String FILE_PREFIX = DefaultSettings.FILE_STORAGE_DIR + DefaultSettings.FILE_ACCESS_URL_PATH;
     public static final int DIRECTORIES_COUNT = 100;
-    private static final Logger log = LoggerFactory.getLogger(ImageUtil.class);
+    private static final Set<String> ALLOWED_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
+    private static final long MAX_SIZE_BYTES = 50L * 1024 * 1024; //  50 Mb
 
+    private static final Logger log = LoggerFactory.getLogger(ImageUtil.class);
 
     private static String getImagePathFromUuid(UUID uuid) {
         StringBuilder sb = new StringBuilder();
@@ -29,44 +34,124 @@ public class ImageUtil {
         return sb.toString();
     }
 
-    public static UuidAndLoginAndPath parseAndSave(HttpServletRequest req, String parameterName) throws ServletException, IOException {
-        log.atInfo().log("Получаю картинку из формы");
-        Part part = req.getPart(parameterName);
-
-        log.atInfo().log("Получаем логин пользователя из http сессии");
-        String userLoginFromSession = (String) req.getSession().getAttribute("login");
-
-        if (part == null || part.getSize() == 0) {
-            throw new IOException("part is null");
-        }
-
-        log.atInfo().log("Получаю название картинки");
-        String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-        String filenameExtension = filename.substring(filename.lastIndexOf("."));
-        UUID uuid = UUID.randomUUID();
-
-        log.atInfo().log("Генерирую путь для хранения");
-        String shortPath = getImagePathFromUuid(uuid) + filenameExtension;
-        String path = FILE_PREFIX + shortPath;
-
-        File file = new File(path);
-
-        InputStream content = part.getInputStream();
-
-        file.getParentFile().mkdirs();
-        file.createNewFile();
-        FileOutputStream outputStream = new FileOutputStream(file);
-        byte[] buffer = new byte[content.available()];
-        content.read(buffer);
-        outputStream.write(buffer);
-        outputStream.close();
-
-        log.atInfo().log("Сохранил картинку на сервер");
-        String resultPath = DefaultSettings.FILE_ACCESS_URL_PATH + shortPath;
-        return new UuidAndLoginAndPath(uuid, userLoginFromSession, resultPath);
-    }
-
     public static String getPathAfterWebapp(String filePrefix) {
         return filePrefix.split("webapp")[1];
+    }
+
+    private static String contentTypeToExt(String ct) {
+        if ("image/jpeg".equals(ct)) return ".jpg";
+        if ("image/png".equals(ct)) return ".png";
+        if ("image/webp".equals(ct)) return ".webp";
+        return "";
+    }
+
+    public static List<UuidAndLoginAndPath> handlePhotos(HttpServletRequest req, String parameterName) throws ServletException, IOException, InvalidImageExtensionException, InvalidImageSizeException, InvalidImageNameException {
+        log.atInfo().log("Получаю картинки из формы, параметр: %s", parameterName);
+
+        Collection<Part> parts = req.getParts();
+        log.atInfo().log("Всего частей в запросе: %d", parts.size());
+
+
+        List<Part> partList = parts.stream()
+                .filter(part -> {
+                    String name = part.getName();
+                    return parameterName.equals(name) || (parameterName + "[]").equals(name);
+                })
+                .filter(part -> part.getSize() > 0)
+                .toList();
+
+        log.atInfo().log("Отфильтровано файлов с именем %s/[] и ненулевым размером: %d", parameterName, partList.size());
+
+        if (partList.isEmpty()) {
+            log.atInfo().log("Файлы не переданы, возвращаю пустой список");
+            return Collections.emptyList();
+        }
+
+        String userLoginFromSession = (String) req.getSession().getAttribute("login");
+        log.atInfo().log("Пользователь из сессии: %s", userLoginFromSession);
+
+        List<UuidAndLoginAndPath> result = new ArrayList<>();
+
+        int index = 0;
+        for (Part part : partList) {
+            index++;
+            String contentType = part.getContentType();
+            long size = part.getSize();
+
+            log.atInfo().log("#%d: Получен файл: name=%s, contentType=%s, size=%d", index, part.getName(), contentType, size);
+
+            if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
+                log.atError().log("#%d: Отклонён: неподдерживаемый формат: %s", index, contentType);
+                part.delete();
+                throw new InvalidImageExtensionException("Неподдерживаемый формат: " + contentType);
+            }
+            if (size > MAX_SIZE_BYTES) {
+                log.atError().log("#%d: Отклонён: размер %d > лимит %d", index, size, MAX_SIZE_BYTES);
+                part.delete();
+                throw new InvalidImageSizeException("Файл превышает допустимый размер " + MAX_SIZE_BYTES + " байт");
+            }
+
+            String submitted = part.getSubmittedFileName();
+            log.atInfo().log("#%d: submittedFileName=%s", index, submitted);
+
+            if (submitted == null || submitted.isBlank()) {
+                log.atError().log("#%d: Отклонён: пустое имя файла", index);
+                part.delete();
+                throw new InvalidImageNameException("Пустое имя файла");
+            }
+
+            String filename = Paths.get(submitted).getFileName().toString();
+            int dot = filename.lastIndexOf('.');
+            String ext = (dot >= 0 && dot < filename.length() - 1) ? filename.substring(dot) : contentTypeToExt(contentType);
+
+            log.atInfo().log("#%d: Итоговое имя=%s, расширение=%s", index, filename, ext);
+
+            UUID uuid = UUID.randomUUID();
+            String shortPath = getImagePathFromUuid(uuid) + ext;
+            String path = FILE_PREFIX + shortPath;
+
+            File file = new File(path);
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                boolean mk = parent.mkdirs();
+                log.atInfo().log("#%d: Создание директорий %s: %s", index, parent, mk ? "успех" : "ошибка");
+                if (!mk) {
+                    part.delete();
+                    throw new IOException("Не удалось создать директории: " + parent);
+                }
+            }
+
+            long started = System.nanoTime();
+            try (InputStream in = part.getInputStream();
+                 OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
+
+                byte[] buf = new byte[64 * 1024];
+                int r;
+                long totalWritten = 0L;
+                while ((r = in.read(buf)) != -1) {
+                    out.write(buf, 0, r);
+                    totalWritten += r;
+                }
+                out.flush();
+                long tookMs = (System.nanoTime() - started) / 1_000_000;
+                log.atInfo().log("#%d: Запись завершена: %d байт в %d мс, путь=%s", index, totalWritten, tookMs, path);
+
+            } catch (IOException exception) {
+                log.atError().log("#%d: Ошибка записи файла, удаляю %s", index, path);
+                try { file.delete(); } catch (Exception ignore) {}
+                part.delete();
+                throw exception;
+            }
+
+            part.delete();
+            log.atInfo().log("#%d: Временные ресурсы Part очищены", index);
+
+            String resultPath = DefaultSettings.FILE_ACCESS_URL_PATH + shortPath;
+            result.add(new UuidAndLoginAndPath(uuid, userLoginFromSession, resultPath));
+            log.atInfo().log("#%d: Сформирован результат: uuid=%s, url=%s", index, uuid, resultPath);
+        }
+
+        log.atInfo().log("Сохранено файлов: %d", result.size());
+        return result;
     }
 }

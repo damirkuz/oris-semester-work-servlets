@@ -49,7 +49,7 @@ public class LoginPasswordUtil {
     public static boolean isValidPassword(String password) {
         log.atInfo().log("Проверяю пароль " + password);
         if (password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH) {
-            log.atError().log("Пароль" + password + "некорректной длины");
+            log.atError().log("Пароль " + password + "некорректной длины");
             return false;
         }
 
@@ -59,7 +59,7 @@ public class LoginPasswordUtil {
     public static boolean isValidLogin(String login) {
         log.atInfo().log("Проверяю логин " + login);
         if (login.length() < MIN_LOGIN_LENGTH || login.length() > MAX_LOGIN_LENGTH) {
-            log.atError().log("Логин" + login + "некорректной длины");
+            log.atError().log("Логин " + login + "некорректной длины");
             return false;
         }
 
