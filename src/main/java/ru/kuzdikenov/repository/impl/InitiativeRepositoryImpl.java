@@ -64,10 +64,11 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
                 preparedStatement.setInt(2, initiativeId);
                 preparedStatement.addBatch();
                 if (++count % batchSize == 0) {
-                    preparedStatement.execute();
+                    preparedStatement.executeBatch();
+                    preparedStatement.clearBatch();
                 }
             }
-            preparedStatement.execute();
+            preparedStatement.executeBatch();
         }
     }
 
@@ -89,11 +90,9 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
             return DatabaseUtil.withTransaction(dataSource, connection -> {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-                    preparedStatement.setInt(1, initiativeId);
+                    preparedStatement.setInt(1, initiativeId);;
 
-                    preparedStatement.execute();
-
-                    ResultSet rs = preparedStatement.getGeneratedKeys();
+                    ResultSet rs = preparedStatement.executeQuery();
                     rs.next();
 
 
@@ -128,6 +127,25 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
     @Override
     public void changeStatus(Initiative initiative, InitiativeStatus initiativeStatus) {
 
+    }
+
+    @Override
+    public boolean checkExists(int initiativeId) {
+        log.atInfo().log("Проверяем существует ли инициатива " + initiativeId);
+
+        String sql = "SELECT EXISTS(SELECT 1 FROM forum.initiative WHERE id = ?) AS exists";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, initiativeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getBoolean("exists");
+            }
+        } catch (SQLException e) {
+            log.atError().log("Ошибка при проверке существования инициативы " + initiativeId);
+            throw new RuntimeException(e);
+        }
     }
 
 

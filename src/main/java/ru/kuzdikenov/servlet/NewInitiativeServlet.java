@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @MultipartConfig
-@WebServlet(name = "NewInitiative", urlPatterns = "/new-initiative")
+@WebServlet(name = "NewInitiative", urlPatterns = "/new-initiative/*")
 public class NewInitiativeServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(NewInitiativeServlet.class);
 

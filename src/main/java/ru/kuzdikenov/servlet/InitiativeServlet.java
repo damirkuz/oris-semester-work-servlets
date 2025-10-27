@@ -38,7 +38,7 @@ public class InitiativeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String initiativeId = UrlUtil.getUrlAfterSlash(req, resp);
+        String initiativeId = UrlUtil.getUrlAfterSlash(req, resp, 1);
 
         if (initiativeId == null) {
             return; // go to 404
@@ -54,16 +54,43 @@ public class InitiativeServlet extends HttpServlet {
             User creatorUser = userService.getById(initiative.getCreatorUserId());
 
             boolean isSelfUserInitiative = creatorUser.getLogin().equals(userLoginFromSession);
-
             log.atInfo().log("Пользователь открыл " + (isSelfUserInitiative ? "свою": "чужую") + " инициативу");
+
+            boolean likedByMe = initiativeService.checkUserLiked(userLoginFromSession, initiative.getInitiativeId());
+
             req.setAttribute("isSelfUserInitiative", isSelfUserInitiative);
+            req.setAttribute("likedByMe", likedByMe);
+            req.setAttribute("initiative", initiative);
 
-
-//            req.getRequestDispatcher("/profile.ftl").forward(req, resp);
+            req.getRequestDispatcher("/initiative.ftl").forward(req, resp);
         } catch (UserNotFoundInDatabaseException | InitiativeNotFoundInDatabaseException e) {
             log.atError().log(e.getMessage());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        log.atInfo().log("Получаем логин пользователя из строки");
+        int initiativeId = Integer.parseInt(UrlUtil.getUrlAfterSlash(req, resp, 1).split("/")[0]);
+
+        String userAction = UrlUtil.getUrlAfterSlash(req, resp, 2); // for example: like, edit, comment
+
+        String userLoginFromSession = (String) req.getSession().getAttribute("login");
+
+        switch (userAction) {
+            case "like": {
+                try {
+                    initiativeService.like(userLoginFromSession, initiativeId);
+                    resp.sendRedirect("/initiative/" + initiativeId);
+                } catch (InitiativeNotFoundInDatabaseException | UserNotFoundInDatabaseException e) {
+                    log.atError().log(e.getMessage());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }
+                break;
+            }
+            default: return; // 404
         }
     }
 }

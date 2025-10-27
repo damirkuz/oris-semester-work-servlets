@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface ImageRepository {
     void save(UUID uuid, int uploaderId, String path);
     List<Image> getAllImagesFromInitiative(Initiative initiative);
-//    Image getById(int imageId);
     void delete(int imageId);
     Image getByUuid(UUID uuid) throws ImageNotFoundInDatabaseException;
 }

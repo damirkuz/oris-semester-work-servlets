@@ -6,12 +6,12 @@ import java.io.IOException;
 
 public class UrlUtil {
 
-    public static String getUrlAfterSlash(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public static String getUrlAfterSlash(HttpServletRequest req, HttpServletResponse resp, int slashIndex) throws IOException {
         String path = req.getPathInfo();
         if (path == null || path.equals("/")) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-        return path.substring(1);
+        return path.split("/")[slashIndex];
     }
 }

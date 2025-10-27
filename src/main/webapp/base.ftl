@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <title><@title/></title>
 
-    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Bootstrap 5 JS bundle-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 

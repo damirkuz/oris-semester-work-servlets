@@ -71,7 +71,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setObject(1, commentId);
+            ps.setInt(1, commentId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return getCommentFromResultSet(rs);

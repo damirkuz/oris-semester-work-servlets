@@ -38,7 +38,7 @@ public class UserProfileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String userLogin = UrlUtil.getUrlAfterSlash(req, resp);
+        String userLogin = UrlUtil.getUrlAfterSlash(req, resp, 1);
 
         if (userLogin == null) {
             return; // go to 404
@@ -66,7 +66,7 @@ public class UserProfileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.atInfo().log("Получаем логин пользователя из строки");
-        String userLogin = UrlUtil.getUrlAfterSlash(req, resp);
+        String userLogin = UrlUtil.getUrlAfterSlash(req, resp, 1);
 
         if (userLogin == null) {
             return; // go to 404

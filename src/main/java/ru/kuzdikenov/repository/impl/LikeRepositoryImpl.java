@@ -3,18 +3,13 @@ package ru.kuzdikenov.repository.impl;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.kuzdikenov.entity.Comment;
 import ru.kuzdikenov.entity.Initiative;
 import ru.kuzdikenov.entity.Like;
-import ru.kuzdikenov.exception.CommentNotFoundInDatabaseException;
 import ru.kuzdikenov.exception.LikeNotFoundInDatabaseException;
 import ru.kuzdikenov.helper.DatabaseUtil;
 import ru.kuzdikenov.repository.LikeRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +21,24 @@ public class LikeRepositoryImpl implements LikeRepository {
 
     @Override
     public void save(Like like) {
+        log.atInfo().log("Сохраняю лайк пользователя: " + like.getUserId() + " на инициативу " + like.getInitiativeId());
+        String sql = "insert into forum.likes (user_id, initiative_id) values (?, ?)";
 
+        try {
+            DatabaseUtil.withTransaction(dataSource, connection -> {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                    preparedStatement.setInt(1, like.getUserId());
+                    preparedStatement.setInt(2, like.getInitiativeId());
+                    preparedStatement.execute();
+
+                    log.atInfo().log("Лайк пользователя: " + like.getUserId() + " на инициативу " + like.getInitiativeId() + " сохранён");
+                    return 0;
+                }
+            });
+        } catch (SQLException e) {
+            log.atError().log(e.getMessage());
+        }
     }
 
     @Override
@@ -66,7 +78,7 @@ public class LikeRepositoryImpl implements LikeRepository {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setObject(1, likeId);
+            ps.setInt(1, likeId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return getLikeFromResultSet(rs);
@@ -80,6 +92,25 @@ public class LikeRepositoryImpl implements LikeRepository {
         }
     }
 
+    @Override
+    public boolean checkUserLikedInitiative(int userId, int initiativeId) {
+        log.atInfo().log("Проверяем поставил ли лайк пользователь " + userId + " инициативе " + initiativeId);
+        String sql = "SELECT EXISTS(SELECT 1 FROM forum.likes WHERE user_id = ? AND initiative_id = ?) AS exists";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, initiativeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getBoolean("exists");
+            }
+        } catch (SQLException e) {
+            log.atError().log("Ошибка при поиске лайка пользователя " + userId + " на инициативе " + initiativeId);
+            throw new RuntimeException(e);
+        }
+    }
+
     private Like getLikeFromResultSet(ResultSet resultSet) throws SQLException {
         return new Like(
                 resultSet.getInt("id"),
@@ -89,7 +120,24 @@ public class LikeRepositoryImpl implements LikeRepository {
     }
 
     @Override
-    public void delete(int likeId) {
+    public void delete(int userId, int initiativeId) {
+        log.atInfo().log("Удаляю лайк пользователя: " + userId + " на инициативу " + initiativeId);
+        String sql = "delete from forum.likes WHERE user_id = ? AND initiative_id = ?";
 
+        try {
+            DatabaseUtil.withTransaction(dataSource, connection -> {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                    preparedStatement.setInt(1, userId);
+                    preparedStatement.setInt(2, initiativeId);
+                    preparedStatement.execute();
+
+                    log.atInfo().log("Лайк пользователя: " + userId + " на инициативу " + initiativeId + " удалён");
+                    return 0;
+                }
+            });
+        } catch (SQLException e) {
+            log.atError().log(e.getMessage());
+        }
     }
 }

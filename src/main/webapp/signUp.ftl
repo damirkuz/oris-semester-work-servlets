@@ -43,5 +43,3 @@
         })
     </script>
 </#macro>
-
-</html>

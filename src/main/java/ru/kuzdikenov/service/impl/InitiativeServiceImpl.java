@@ -57,4 +57,38 @@ public class InitiativeServiceImpl implements InitiativeService {
 
         return initiative;
     }
+
+    @Override
+    public boolean checkUserLiked(String userLogin, int initiativeId) {
+        int userId;
+        try {
+            userId = userRepository.getByLogin(userLogin).getId();
+        } catch (UserNotFoundInDatabaseException e) {
+            return false;
+        }
+        return likeRepository.checkUserLikedInitiative(userId, initiativeId);
+    }
+
+    @Override
+    public boolean checkExists(int initiativeId) {
+        return initiativeRepository.checkExists(initiativeId);
+    }
+
+    @Override
+    public void like(String userLogin, int initiativeId) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException {
+        if (!checkExists(initiativeId)) {
+            throw new InitiativeNotFoundInDatabaseException();
+        }
+
+        int userId = userRepository.getByLogin(userLogin).getId();
+
+        if (checkUserLiked(userLogin, initiativeId)) {
+            likeRepository.delete(userId, initiativeId);
+        } else {
+            Like like = new Like(userId, initiativeId);
+            likeRepository.save(like);
+        }
+    }
+
+
 }

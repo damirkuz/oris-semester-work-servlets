@@ -11,6 +11,11 @@ public class Like {
         this.initiativeId = initiativeId;
     }
 
+    public Like(int userId, int initiativeId) {
+        this.userId = userId;
+        this.initiativeId = initiativeId;
+    }
+
     public int getId() {
         return id;
     }

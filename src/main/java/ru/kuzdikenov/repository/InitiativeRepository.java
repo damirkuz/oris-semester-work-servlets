@@ -16,4 +16,5 @@ public interface InitiativeRepository {
     void changeTitle(Initiative initiative, String newTitle);
     void changeBody(Initiative initiative, String newBody);
     void changeStatus(Initiative initiative, InitiativeStatus initiativeStatus);
+    boolean checkExists(int initiativeId);
 }
