@@ -87,7 +87,7 @@ public class UserProfileServlet extends HttpServlet {
         UUID imageUuid = null;
         try {
             // save image from form to server
-            List<UuidAndLoginAndPath> resList = ImageUtil.handlePhotos(req, "avatar");
+            List<UuidAndLoginAndPath> resList = ImageUtil.handlePhotosAndSaveToCloudinary(req, "avatar");
             if (resList.size() == 1) {
                 UuidAndLoginAndPath res = resList.getFirst();
                 // save image path to db

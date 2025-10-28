@@ -79,7 +79,7 @@ public class NewInitiativeServlet extends HttpServlet {
         List<Image> result = new ArrayList<>();
 
         try {
-            List<UuidAndLoginAndPath> images = ImageUtil.handlePhotos(req, "photos");
+            List<UuidAndLoginAndPath> images = ImageUtil.handlePhotosAndSaveToCloudinary(req, "photos");
             for (UuidAndLoginAndPath u : images) {
                 imageService.save(u.uuid(), u.login(), u.path());
                 result.add(imageService.getByUuid(u.uuid()));

@@ -14,7 +14,7 @@ import ru.kuzdikenov.service.ImageService;
 import java.util.UUID;
 
 public class ImageServiceImpl implements ImageService {
-    public static final String FILE_PREFIX = DefaultSettings.FILE_STORAGE_DIR;
+//    public static final String FILE_PREFIX = DefaultSettings.FILE_STORAGE_DIR;
     public static final int DIRECTORIES_COUNT = 100;
     private static final Logger log = LoggerFactory.getLogger(ImageUtil.class);
 
