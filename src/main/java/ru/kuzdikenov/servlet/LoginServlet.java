@@ -41,8 +41,8 @@ public class LoginServlet extends HttpServlet {
 
             httpSession.setMaxInactiveInterval(DefaultSettings.httpSessionMaxInactiveInterval);
 
-
-            req.getRequestDispatcher("index.ftl").forward(req, resp);
+            System.out.println(req.getContextPath());
+            resp.sendRedirect(req.getContextPath() + "/");
         } else {
             req.setAttribute("error", "Неправильный логин или пароль");
             req.getRequestDispatcher("login.ftl").forward(req, resp);

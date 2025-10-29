@@ -8,36 +8,14 @@
             <div class="col-12 col-lg-10">
                 <div class="card border-primary shadow-sm">
                     <div class="card-body">
-
-                        <script>
-                            // format initiative created date with user timeZone
-                            document.addEventListener("DOMContentLoaded", function() {
-                                const registrationDateElem = document.getElementById('initiative-created-date');
-                                const rawDateStr = registrationDateElem.textContent;
-                                if (rawDateStr) {
-                                    const date = new Date(rawDateStr);
-                                    const formattedDate = date.toLocaleString('ru-RU', {
-                                        year: 'numeric',
-                                        month: '2-digit',
-                                        day: '2-digit',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        second: '2-digit'
-                                    });
-                                    registrationDateElem.textContent = formattedDate;
-                                }
-                            });
-                        </script>
-
-
                         <div class="d-flex align-items-start justify-content-between mb-3">
                             <div>
                                 <h1 class="h3 text-primary mb-1">${initiative.title}</h1>
                                 <div class="text-muted small">
-                                    <span id="initiative-created-date">${initiative.createdAt!}</span>
+                                    <span class="initiative-created-date">${initiative.createdAt!}</span>
                                 </div>
                             </div>
-                            <#-- Бейдж статуса -->
+
                             <#assign status = initiative.status?string>
                             <#assign statusClassMap = {
                             "SUGGESTED":   "bg-warning text-dark",
@@ -50,7 +28,7 @@
                             <span class="badge ${statusClass}">${status}</span>
                         </div>
 
-                        <#-- Карусель изображений -->
+                        <#-- images -->
                         <#if initiative.images?? && initiative.images?size gt 0>
                             <#assign carouselId = "initiativeCarousel-" + (initiative.initiativeId?string)>
                             <div id="${carouselId}" class="carousel slide mb-4" data-bs-ride="carousel">
@@ -90,7 +68,6 @@
 
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
                             <form action="/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
-                                <input type="hidden" name="_csrf" value="${_csrfToken!}">
                                 <button type="submit"
                                         class="btn ${likedByMe?then('btn-primary','btn-outline-primary')}"
                                         aria-pressed="${likedByMe?c}">
@@ -146,7 +123,6 @@
                                                     </#if>
                                                     <#if (isAdmin?? && isAdmin) || (comment.ownedByMe?? && comment.ownedByMe)>
                                                         <form action="/comment/${comment.id}/delete" method="post" class="m-0">
-                                                            <input type="hidden" name="_csrf" value="${_csrfToken!}">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
                                                         </form>
                                                     </#if>
@@ -156,7 +132,6 @@
                                             <#if comment.ownedByMe?? && comment.ownedByMe>
                                                 <form id="edit-form-${comment?index}" action="/comment/${comment.id}/edit" method="post"
                                                       class="row g-2 mt-2 d-none">
-                                                    <input type="hidden" name="_csrf" value="${_csrfToken!}">
                                                     <div class="col-12 col-md">
                                                         <input type="text" name="text" value="${comment.text}" class="form-control" required>
                                                     </div>
@@ -173,7 +148,6 @@
                             </#if>
 
                             <form action="/initiative/${initiative.initiativeId}/comment" method="post" class="row g-2">
-                                <input type="hidden" name="_csrf" value="${_csrfToken!}">
                                 <div class="col-12 col-md">
                                     <input type="text" name="comment" class="form-control" placeholder="Оставить комментарий..." required>
                                 </div>

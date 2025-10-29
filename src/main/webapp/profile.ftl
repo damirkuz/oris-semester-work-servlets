@@ -62,26 +62,5 @@
             </#if>
 
         </#if>
-
-
-        <script>
-            // format registration date with user timeZone
-            document.addEventListener("DOMContentLoaded", function() {
-                const registrationDateElem = document.getElementById('registration-date');
-                const rawDateStr = registrationDateElem.textContent;
-                if (rawDateStr) {
-                    const date = new Date(rawDateStr);
-                    const formattedDate = date.toLocaleString('ru-RU', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    registrationDateElem.textContent = formattedDate;
-                }
-            });
-        </script>
     </div>
 </#macro>

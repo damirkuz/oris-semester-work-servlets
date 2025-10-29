@@ -11,6 +11,7 @@ import ru.kuzdikenov.repository.InitiativeRepository;
 
 import java.sql.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class InitiativeRepositoryImpl implements InitiativeRepository {
@@ -72,9 +73,22 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
         }
     }
 
+
     @Override
-    public List<Initiative> getAllFromUser(User user) {
-        return List.of();
+    public List<Integer> getAllIds() {
+        String sql = "SELECT id FROM forum.initiative";
+        List<Integer> result = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getInt("id"));
+            }
+            return result;
+        } catch (SQLException e) {
+            log.atError().log("Ошибка при получении id инициатив");
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -14,4 +14,5 @@ public interface InitiativeService {
     void comment(String userLogin, int initiativeId, String body) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException;
     void delete(int initiativeId) throws InitiativeNotFoundInDatabaseException;
     void edit(int initiativeId, String title, String body, List<Image> images, InitiativeStatus status) throws InitiativeNotFoundInDatabaseException, NoChangesException;
+    List<Initiative> getAll();
 }

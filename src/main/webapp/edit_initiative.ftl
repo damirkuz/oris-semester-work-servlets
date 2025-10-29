@@ -112,49 +112,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // preview added images
-        (function () {
-            const input = document.getElementById('photos');
-            const wrap = document.getElementById('imagesPreview');
-            const grid = document.getElementById('imagesPreviewGrid');
-            if (!input || !wrap || !grid) return;
-
-            const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-
-            input.addEventListener('change', () => {
-                grid.innerHTML = '';
-                const files = Array.from(input.files || []);
-                if (!files.length) {
-                    wrap.style.display = 'none';
-                    return;
-                }
-                files.forEach((f, idx) => {
-                    if (!allowed.includes(f.type)) return;
-                    const col = document.createElement('div');
-                    col.className = 'col';
-                    const card = document.createElement('div');
-                    card.className = 'card h-100';
-                    const img = document.createElement('img');
-                    img.className = 'card-img-top';
-                    img.alt = f.name;
-                    card.appendChild(img);
-                    const body = document.createElement('div');
-                    body.className = 'card-body py-2';
-                    const meta = document.createElement('div');
-                    meta.className = 'small text-muted text-truncate';
-                    meta.textContent = f.name;
-                    body.appendChild(meta);
-                    card.appendChild(body);
-                    col.appendChild(card);
-                    grid.appendChild(col);
-                    const reader = new FileReader();
-                    reader.onload = e => img.src = e.target.result;
-                    reader.readAsDataURL(f);
-                });
-                wrap.style.display = 'block';
-            });
-        })();
-    </script>
 </#macro>

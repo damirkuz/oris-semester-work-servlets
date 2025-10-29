@@ -165,4 +165,16 @@ public class InitiativeServiceImpl implements InitiativeService {
         }
     }
 
+    @Override
+    public List<Initiative> getAll() {
+        List<Integer> ids = initiativeRepository.getAllIds();
+        List<Initiative> result = new ArrayList<>();
+        for (Integer id: ids) {
+            try {
+                result.add(getById(id,null));
+            } catch (InitiativeNotFoundInDatabaseException _) {}
+        }
+        return result;
+    }
+
 }
