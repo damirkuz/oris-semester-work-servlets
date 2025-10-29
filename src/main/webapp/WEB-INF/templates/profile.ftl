@@ -37,9 +37,10 @@
                         <small>Оставьте поле пустым, если не хотите менять пароль</small>
                     </div>
 
-                    <div class="form-group">
-                        <label for="avatar">Загрузить новый аватар</label>
-                        <input type="file" id="avatar" name="avatar" accept="image/*" />
+                    <div class="mb-3">
+                        <label for="avatar" class="form-label">Загрузить новый аватар</label>
+                        <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*">
+                        <div class="form-text">Поддерживаются PNG, JPG, WEBP</div>
                     </div>
 
                     <#if error?? && error?has_content>

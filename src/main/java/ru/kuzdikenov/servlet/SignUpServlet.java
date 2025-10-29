@@ -41,7 +41,7 @@ public class  SignUpServlet extends HttpServlet {
 
         try {
             userService.signUp(name, login, password);
-            resp.sendRedirect("/login");
+            resp.sendRedirect(req.getContextPath() + "/login");
         } catch (InvalidLoginException | InvalidPasswordException | UserAlreadyExistsInDatabaseException e) {
             log.atError().log(e.getMessage());
             req.setAttribute("error", e.getMessage());

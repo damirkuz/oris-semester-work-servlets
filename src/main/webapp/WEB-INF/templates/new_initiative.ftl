@@ -55,16 +55,19 @@
                 <small class="hint">Обязательное поле. До 2000 символов.</small>
             </div>
 
-            <div class="form-group">
-                <label for="photos">Фото (необязательно)</label>
+            <div class="mb-3">
+                <label for="photos" class="form-label">Добавить фото (необязательно)</label>
                 <input id="photos"
                        name="photos[]"
                        type="file"
+                       class="form-control"
                        accept="image/*"
-                       multiple/>
-                <div class="image-preview" id="imagesPreview" style="display:none;"></div>
-                <small class="hint">До ${maxCount} изображений, максимум ${maxSizeMb} МБ каждое (JPEG, PNG,
-                    WEBP).</small>
+                       multiple>
+                <div class="form-text">До ${maxCount} изображений, максимум ${maxSizeMb} МБ каждое (JPEG, PNG, WEBP).</div>
+
+                <div id="imagesPreview" class="mt-2" style="display:none;">
+                    <div class="row row-cols-2 row-cols-md-6 g-2" id="imagesPreviewGrid"></div>
+                </div>
             </div>
 
             <div class="form-actions">

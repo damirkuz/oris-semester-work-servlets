@@ -91,7 +91,7 @@ public class CommentServlet extends HttpServlet {
 
 
 
-        resp.sendRedirect("/initiative/" + comment.getInitiativeId());
+        resp.sendRedirect(req.getContextPath() + "/initiative/" + comment.getInitiativeId());
 
     }
 }

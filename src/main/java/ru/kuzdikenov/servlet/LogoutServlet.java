@@ -15,6 +15,6 @@ public class LogoutServlet extends HttpServlet {
         HttpSession httpSession = req.getSession();
         httpSession.setAttribute("userLoggedIn", false);
         httpSession.setAttribute("login", "");
-        resp.sendRedirect("/login.ftl");
+        resp.sendRedirect(req.getContextPath() + "/login.ftl");
     }
 }

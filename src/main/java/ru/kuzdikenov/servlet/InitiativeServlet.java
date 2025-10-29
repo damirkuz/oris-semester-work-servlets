@@ -83,7 +83,7 @@ public class InitiativeServlet extends HttpServlet {
         req.setAttribute("isAdmin", isAdmin);
         req.setAttribute("initiative", initiative);
         req.setAttribute("initiativeStatuses", InitiativeStatus.values());
-        req.getRequestDispatcher(req.getContextPath() + "/edit_initiative.ftl").forward(req, resp);
+        req.getRequestDispatcher("/edit_initiative.ftl").forward(req, resp);
     }
 
 

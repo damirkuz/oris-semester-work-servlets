@@ -22,7 +22,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        resp.sendRedirect("/login.ftl");
+        resp.sendRedirect(req.getContextPath() + "/login.ftl");
     }
 
     @Override
@@ -45,7 +45,7 @@ public class LoginServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/");
         } else {
             req.setAttribute("error", "Неправильный логин или пароль");
-            req.getRequestDispatcher("login.ftl").forward(req, resp);
+            req.getRequestDispatcher("/login.ftl").forward(req, resp);
         }
     }
 }
