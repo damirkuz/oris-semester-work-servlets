@@ -130,6 +130,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.getById(userId);
     }
 
+    @Override
+    public User getByLogin(String userLogin) throws UserNotFoundInDatabaseException {
+        return userRepository.getByLogin(userLogin);
+    }
+
 
     private boolean isUserPassword(User user, String password) {
         return user.getPasswordHash().equals(LoginPasswordUtil.encrypt(password));

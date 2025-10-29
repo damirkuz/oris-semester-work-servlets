@@ -13,4 +13,5 @@ public interface UserService {
     UserProfile getUserProfile(String login) throws UserNotFoundInDatabaseException;
     void editProfile(String login, String name, String password, UUID profilePicture) throws InvalidPasswordException, UserNotFoundInDatabaseException, NoChangesException;
     User getById(int userId) throws UserNotFoundInDatabaseException;
+    User getByLogin(String userLogin) throws UserNotFoundInDatabaseException;
 }

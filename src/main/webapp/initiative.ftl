@@ -81,6 +81,12 @@
 
                         <p class="card-text mb-4">${initiative.body}</p>
 
+                        <#if (RequestParameters.error??)>
+                            <div class="error-message">
+                                <#if RequestParameters.error == "nonAuthorizedUser">Авторизуйтесь, чтобы взаимодействовать с инициативой</#if>
+                            </div>
+                        </#if>
+
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
                             <form action="/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
                                 <input type="hidden" name="_csrf" value="${_csrfToken!}">
@@ -119,7 +125,7 @@
                                                             Изменить
                                                         </button>
                                                     </#if>
-                                                    <#if isAdmin?? && isAdmin>
+                                                    <#if (isAdmin?? && isAdmin) || (comment.ownedByMe?? && comment.ownedByMe)>
                                                         <form action="/comment/${comment.id}/delete" method="post" class="m-0">
                                                             <input type="hidden" name="_csrf" value="${_csrfToken!}">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
@@ -164,7 +170,7 @@
     </div>
 
     <script>
-        // Тоггл инлайн-редактирования комментария
+        // toggle inline-edit comment
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('[data-edit-target]');
             if (!btn) return;

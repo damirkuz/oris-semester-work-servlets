@@ -1,5 +1,7 @@
 package ru.kuzdikenov.entity;
 
+import ru.kuzdikenov.dto.CommentOnInitiative;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -11,10 +13,10 @@ public class Initiative {
     private InitiativeStatus status;
     private List<Image> images;
     private List<Like> likes;
-    private List<Comment> comments;
+    private List<CommentOnInitiative> comments;
     private Instant createdAt;
 
-    public Initiative(int creatorUserId, String title, String body, InitiativeStatus status, List<Image> images, List<Like> likes, List<Comment> comments) {
+    public Initiative(int creatorUserId, String title, String body, InitiativeStatus status, List<Image> images, List<Like> likes, List<CommentOnInitiative> comments) {
         this.creatorUserId = creatorUserId;
         this.title = title;
         this.body = body;
@@ -24,7 +26,7 @@ public class Initiative {
         this.comments = comments;
     }
 
-    public Initiative(int initiativeId, int creatorUserId, String title, String body, InitiativeStatus status, List<Image> images, List<Like> likes, List<Comment> comments, Instant createdAt) {
+    public Initiative(int initiativeId, int creatorUserId, String title, String body, InitiativeStatus status, List<Image> images, List<Like> likes, List<CommentOnInitiative> comments, Instant createdAt) {
         this.initiativeId = initiativeId;
         this.creatorUserId = creatorUserId;
         this.title = title;
@@ -82,11 +84,11 @@ public class Initiative {
         this.likes = likes;
     }
 
-    public List<Comment> getComments() {
+    public List<CommentOnInitiative> getComments() {
         return comments;
     }
 
-    public void setComments(List<Comment> comments) {
+    public void setComments(List<CommentOnInitiative> comments) {
         this.comments = comments;
     }
 

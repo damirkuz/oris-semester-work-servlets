@@ -9,8 +9,7 @@ import java.util.List;
 public interface CommentRepository {
     void save(Comment comment);
     List<Comment> getAllFromInitiative(Initiative initiative);
-    void delete(Comment comment);
     Comment getById(int commentId) throws CommentNotFoundInDatabaseException;
-    void changeBody(Comment comment, String newBody);
+    void changeBody(int commentId, String newBody);
     void delete(int commentId);
 }

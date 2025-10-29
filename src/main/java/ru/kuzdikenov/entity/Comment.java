@@ -17,6 +17,12 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
+    public Comment(int authorUserId, int initiativeId, String body) {
+        this.authorUserId = authorUserId;
+        this.initiativeId = initiativeId;
+        this.body = body;
+    }
+
     public int getId() {
         return id;
     }

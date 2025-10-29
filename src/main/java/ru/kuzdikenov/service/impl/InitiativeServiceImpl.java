@@ -1,5 +1,6 @@
 package ru.kuzdikenov.service.impl;
 
+import ru.kuzdikenov.dto.CommentOnInitiative;
 import ru.kuzdikenov.entity.*;
 import ru.kuzdikenov.exception.*;
 import ru.kuzdikenov.helper.InitiativeUtil;
@@ -33,7 +34,7 @@ public class InitiativeServiceImpl implements InitiativeService {
 
         InitiativeStatus status = InitiativeStatus.SUGGESTED;
         List<Like> likes = new ArrayList<>();
-        List<Comment> comments = new ArrayList<>();
+        List<CommentOnInitiative> comments = new ArrayList<>();
         int creatorUserId = 0;
         try {
             creatorUserId = userRepository.getByLogin(creatorLogin).getId();
@@ -46,16 +47,33 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public Initiative getById(String id) throws InitiativeNotFoundInDatabaseException {
+    public Initiative getById(String id, String requesterUserLogin) throws InitiativeNotFoundInDatabaseException {
         int initiativeId = Integer.parseInt(id);
         Initiative initiative = initiativeRepository.getById(initiativeId);;
 
 
         initiative.setImages(imageRepository.getAllImagesFromInitiative(initiative));
-        initiative.setComments(commentRepository.getAllFromInitiative(initiative));
+        List<Comment> commentsFromDb = commentRepository.getAllFromInitiative(initiative);
+        initiative.setComments(getCommentsOnInitiative(commentsFromDb, requesterUserLogin));
         initiative.setLikes(likeRepository.getAllFromInitiative(initiative));
 
         return initiative;
+    }
+
+    private List<CommentOnInitiative> getCommentsOnInitiative(List<Comment> comments, String requesterUserLogin) {
+        List<CommentOnInitiative> commentsOnInitiative = new ArrayList<>();
+        for (Comment comment: comments) {
+            String authorUserLogin;
+            try {
+                authorUserLogin = userRepository.getById(comment.getAuthorUserId()).getLogin();
+            } catch (UserNotFoundInDatabaseException e) {
+                authorUserLogin = null; // in db always have correct user id
+            }
+
+            boolean ownedByMe = authorUserLogin.equals(requesterUserLogin);
+            commentsOnInitiative.add(new CommentOnInitiative(comment.getId(), authorUserLogin, comment.getBody(), ownedByMe));
+        }
+        return commentsOnInitiative;
     }
 
     @Override
@@ -90,5 +108,16 @@ public class InitiativeServiceImpl implements InitiativeService {
         }
     }
 
+    @Override
+    public void comment(String userLogin, int initiativeId, String body) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException {
+        if (!checkExists(initiativeId)) {
+            throw new InitiativeNotFoundInDatabaseException();
+        }
+
+        int userId = userRepository.getByLogin(userLogin).getId();
+
+        Comment comment = new Comment(userId, initiativeId, body);
+        commentRepository.save(comment);
+    }
 
 }

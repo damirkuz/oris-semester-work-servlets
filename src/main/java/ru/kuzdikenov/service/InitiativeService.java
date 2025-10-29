@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface InitiativeService {
     int save(String creatorLogin, String title, String body, List<Image> images) throws FailInitiativeSaveException, InvalidInitiativeTitleException;
-    Initiative getById(String id) throws InitiativeNotFoundInDatabaseException;
+    Initiative getById(String id, String requesterUserLogin) throws InitiativeNotFoundInDatabaseException;
     boolean checkUserLiked(String userLogin, int initiativeId);
     boolean checkExists(int initiativeId);
     void like(String userLogin, int initiativeId) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException;
-
+    void comment(String userLogin, int initiativeId, String body) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException;
 }

@@ -6,15 +6,14 @@ import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.entity.Comment;
 import ru.kuzdikenov.entity.Image;
 import ru.kuzdikenov.entity.Initiative;
+import ru.kuzdikenov.entity.Like;
 import ru.kuzdikenov.exception.CommentNotFoundInDatabaseException;
 import ru.kuzdikenov.exception.ImageNotFoundInDatabaseException;
+import ru.kuzdikenov.exception.LikeNotFoundInDatabaseException;
 import ru.kuzdikenov.helper.DatabaseUtil;
 import ru.kuzdikenov.repository.CommentRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +25,24 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public void save(Comment comment) {
+        log.info("Сохраняю комментарий пользователя: {} на инициативу {} с текстом {}", comment.getAuthorUserId(), comment.getInitiativeId(), comment.getBody());
+        String sql = "insert into forum.comment (author_user_id, initiative_id, body) values (?, ?, ?)";
 
+        try {
+            DatabaseUtil.withTransaction(dataSource, connection -> {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                    preparedStatement.setInt(1, comment.getAuthorUserId());
+                    preparedStatement.setInt(2, comment.getInitiativeId());
+                    preparedStatement.setString(3, comment.getBody());
+                    preparedStatement.execute();
+                    log.info("Комментарий пользователя: {} на инициативу {} с текстом {} сохранён", comment.getAuthorUserId(), comment.getInitiativeId(), comment.getBody());
+                    return 0;
+                }
+            });
+        } catch (SQLException e) {
+            log.atError().log(e.getMessage());
+        }
     }
 
     @Override
@@ -59,10 +75,6 @@ public class CommentRepositoryImpl implements CommentRepository {
         return comments;
     }
 
-    @Override
-    public void delete(Comment comment) {
-
-    }
 
     @Override
     public Comment getById(int commentId) throws CommentNotFoundInDatabaseException {
@@ -96,12 +108,39 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public void changeBody(Comment comment, String newBody) {
+    public void changeBody(int commentId, String newBody) {
+        log.atInfo().log("Меняю текст комментария " + commentId);
 
+        String sql = "UPDATE forum.comment SET body = ? WHERE id = ?";
+
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, newBody);
+            preparedStatement.setInt(2, commentId);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            log.atError().log("Ошибка при обновлении текста комментария: " + commentId);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void delete(int commentId) {
+        log.atInfo().log("Удаляю комментарий " + commentId);
 
+        String sql = "DELETE FROM forum.comment WHERE id = ?";
+
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, commentId);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            log.atError().log("Ошибка при удалении комментария: " + commentId);
+            throw new RuntimeException(e);
+        }
     }
 }

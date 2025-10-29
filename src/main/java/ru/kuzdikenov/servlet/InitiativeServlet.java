@@ -6,6 +6,8 @@ import ru.kuzdikenov.dto.UserProfile;
 import ru.kuzdikenov.entity.Initiative;
 import ru.kuzdikenov.entity.User;
 import ru.kuzdikenov.exception.InitiativeNotFoundInDatabaseException;
+import ru.kuzdikenov.exception.InvalidPasswordException;
+import ru.kuzdikenov.exception.NoChangesException;
 import ru.kuzdikenov.exception.UserNotFoundInDatabaseException;
 import ru.kuzdikenov.helper.UrlUtil;
 import ru.kuzdikenov.service.ImageService;
@@ -30,9 +32,9 @@ public class InitiativeServlet extends HttpServlet {
 
     @Override
     public void init() {
-        this.userService = (UserService) getServletContext().getAttribute("userService");
-        this.imageService = (ImageService) getServletContext().getAttribute("imageService");
-        this.initiativeService = (InitiativeService) getServletContext().getAttribute("initiativeService");
+        userService = (UserService) getServletContext().getAttribute("userService");
+        imageService = (ImageService) getServletContext().getAttribute("imageService");
+        initiativeService = (InitiativeService) getServletContext().getAttribute("initiativeService");
     }
 
     @Override
@@ -45,16 +47,15 @@ public class InitiativeServlet extends HttpServlet {
         }
 
         try {
-            Initiative initiative = initiativeService.getById(initiativeId);
+            String userLoginFromSession = (String) req.getSession().getAttribute("login");
+            Initiative initiative = initiativeService.getById(initiativeId, userLoginFromSession);
 
 
             log.atInfo().log("Проверяем, что пользователь открыл свою же инициативу");
-            String userLoginFromSession = (String) req.getSession().getAttribute("login");
-
             User creatorUser = userService.getById(initiative.getCreatorUserId());
-
             boolean isSelfUserInitiative = creatorUser.getLogin().equals(userLoginFromSession);
             log.atInfo().log("Пользователь открыл " + (isSelfUserInitiative ? "свою": "чужую") + " инициативу");
+
 
             boolean likedByMe = initiativeService.checkUserLiked(userLoginFromSession, initiative.getInitiativeId());
 
@@ -79,10 +80,27 @@ public class InitiativeServlet extends HttpServlet {
 
         String userLoginFromSession = (String) req.getSession().getAttribute("login");
 
+        if (userLoginFromSession == null) {
+            log.atError().log("Неавторизованный пользователь пытается взаимодействовать с инициативой");
+            resp.sendRedirect(req.getContextPath() + "/initiative/" + initiativeId + "?error=nonAuthorizedUser");
+            return;
+        }
+
         switch (userAction) {
             case "like": {
                 try {
                     initiativeService.like(userLoginFromSession, initiativeId);
+                    resp.sendRedirect("/initiative/" + initiativeId);
+                } catch (InitiativeNotFoundInDatabaseException | UserNotFoundInDatabaseException e) {
+                    log.atError().log(e.getMessage());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }
+                break;
+            }
+            case "comment": {
+                try {
+                    String body = req.getParameter("comment");
+                    initiativeService.comment(userLoginFromSession, initiativeId, body);
                     resp.sendRedirect("/initiative/" + initiativeId);
                 } catch (InitiativeNotFoundInDatabaseException | UserNotFoundInDatabaseException e) {
                     log.atError().log(e.getMessage());
