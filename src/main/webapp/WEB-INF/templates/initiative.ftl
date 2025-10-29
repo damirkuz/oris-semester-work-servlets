@@ -67,7 +67,7 @@
                         </#if>
 
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-                            <form action="/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
+                            <form action="${contextPath}/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
                                 <button type="submit"
                                         class="btn ${likedByMe?then('btn-primary','btn-outline-primary')}"
                                         aria-pressed="${likedByMe?c}">
@@ -78,7 +78,7 @@
                             </form>
 
                             <#if isSelfUserInitiative?? && isSelfUserInitiative>
-                                <a href="/initiative/${initiative.initiativeId}/edit" class="btn btn-outline-secondary">
+                                <a href="${contextPath}/initiative/${initiative.initiativeId}/edit" class="btn btn-outline-secondary">
                                     Редактировать инициативу
                                 </a>
                                 <button id="deleteBtn" class="btn btn-outline-secondary">
@@ -90,12 +90,12 @@
                                 // send delete request on button
                                 document.getElementById('deleteBtn').addEventListener('click', async (e) => {
                                     const id = e.currentTarget.dataset.id;
-                                    const res = await fetch(`/initiative/${initiative.initiativeId}`, {
+                                    const res = await fetch(`${contextPath}/initiative/${initiative.initiativeId}`, {
                                         method: 'DELETE',
                                         headers: { 'Accept': 'application/json' }
                                     });
                                     alert("Инициатива удалена");
-                                    window.location.href = '/';
+                                    window.location.href = '${contextPath}/';
 
                                 });
                             </script>
@@ -122,7 +122,7 @@
                                                         </button>
                                                     </#if>
                                                     <#if (isAdmin?? && isAdmin) || (comment.ownedByMe?? && comment.ownedByMe)>
-                                                        <form action="/comment/${comment.id}/delete" method="post" class="m-0">
+                                                        <form action="${contextPath}/comment/${comment.id}/delete" method="post" class="m-0">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
                                                         </form>
                                                     </#if>
@@ -130,7 +130,7 @@
                                             </div>
 
                                             <#if comment.ownedByMe?? && comment.ownedByMe>
-                                                <form id="edit-form-${comment?index}" action="/comment/${comment.id}/edit" method="post"
+                                                <form id="edit-form-${comment?index}" action="${contextPath}/comment/${comment.id}/edit" method="post"
                                                       class="row g-2 mt-2 d-none">
                                                     <div class="col-12 col-md">
                                                         <input type="text" name="text" value="${comment.text}" class="form-control" required>
@@ -147,7 +147,7 @@
                                 <div class="alert alert-secondary" role="alert">Пока нет комментариев</div>
                             </#if>
 
-                            <form action="/initiative/${initiative.initiativeId}/comment" method="post" class="row g-2">
+                            <form action="${contextPath}/initiative/${initiative.initiativeId}/comment" method="post" class="row g-2">
                                 <div class="col-12 col-md">
                                     <input type="text" name="comment" class="form-control" placeholder="Оставить комментарий..." required>
                                 </div>

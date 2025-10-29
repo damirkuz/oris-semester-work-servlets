@@ -25,7 +25,7 @@
         <#if isSelfUserProfile?? && isSelfUserProfile>
             <div class="profile-edit-form">
                 <h2>Редактировать профиль</h2>
-                <form action="/profile/${userProfile.login}" method="post" enctype="multipart/form-data">
+                <form action="${contextPath}/profile/${userProfile.login}" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="name">Новое имя</label>
                         <input type="text" id="name" name="name" class="input-blue" value="${userProfile.name!}" required />

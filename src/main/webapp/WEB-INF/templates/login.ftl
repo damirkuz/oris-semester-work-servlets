@@ -6,7 +6,7 @@
 <#macro content>
     <div class="login-card">
         <h2 class="login-title">Вход</h2>
-        <form action="/login" method="post">
+        <form action="${contextPath}/login" method="post">
             <div class="input-wrapper">
                 <label for="login">Логин</label>
                 <input type="text" id="login" name="login" class="input-blue" required>

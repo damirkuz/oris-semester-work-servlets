@@ -14,7 +14,7 @@
 
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <h1 class="h4 mb-0">Редактировать инициативу</h1>
-                            <a href="/initiative/${initiative.initiativeId}" class="btn btn-outline-secondary">Назад</a>
+                            <a href="${contextPath}/initiative/${initiative.initiativeId}" class="btn btn-outline-secondary">Назад</a>
                         </div>
 
                         <#-- Серверные ошибки -->
@@ -31,7 +31,7 @@
                         </#if>
 
                         <form id="initiativeEditForm"
-                              action="/initiative/${initiative.initiativeId}/edit"
+                              action="${contextPath}/initiative/${initiative.initiativeId}/edit"
                               method="post"
                               enctype="multipart/form-data"
                               novalidate>
@@ -92,7 +92,7 @@
 
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                                <a href="/initiative/${initiative.initiativeId}" class="btn btn-outline-secondary">Отмена</a>
+                                <a href="${contextPath}/initiative/${initiative.initiativeId}" class="btn btn-outline-secondary">Отмена</a>
                             </div>
                         </form>
 

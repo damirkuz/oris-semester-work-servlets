@@ -6,7 +6,7 @@
     <div class="container py-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h1 class="h3 text-primary m-0">Лента инициатив</h1>
-            <a href="/new-initiative" class="btn btn-primary">Опубликовать инициативу</a>
+            <a href="${contextPath}/new-initiative" class="btn btn-primary">Опубликовать инициативу</a>
         </div>
 
         <#if initiatives?? && initiatives?has_content>
@@ -19,7 +19,7 @@
                                 <div class="d-flex align-items-start justify-content-between mb-3">
                                     <div>
                                         <h2 class="h5 text-primary mb-1">
-                                            <a href="/initiative/${initiative.initiativeId}" class="link-primary text-decoration-none">
+                                            <a href="${contextPath}/initiative/${initiative.initiativeId}" class="link-primary text-decoration-none">
                                                 ${initiative.title}
                                             </a>
                                             <div class="text-muted small">
@@ -48,7 +48,7 @@
                                         <div class="carousel-inner">
                                             <#list initiative.images as image>
                                                 <div class="carousel-item ${image?is_first?then('active','')}">
-                                                    <a href="/initiative/${initiative.initiativeId}" class="d-block">
+                                                    <a href="${contextPath}/initiative/${initiative.initiativeId}" class="d-block">
                                                         <img
                                                                 src="${(image.url)!((image.path)!'')}"
                                                                 class="d-block w-100"
@@ -80,13 +80,13 @@
                                     <#assign preview = first + (second?has_content?then('. ' + second, ''))>
                                     <p class="card-text mb-3">
                                         ${preview}<#if bodyText?length gt preview?length>…</#if>
-                                        <a href="/initiative/${initiative.initiativeId}" class="text-decoration-none">Читать далее</a>
+                                        <a href="${contextPath}/initiative/${initiative.initiativeId}" class="text-decoration-none">Читать далее</a>
                                     </p>
                                 </#if>
 
                                 <div class="d-flex flex-wrap align-items-center gap-2">
                                     <#-- Лайк -->
-                                    <form action="/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
+                                    <form action="${contextPath}/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
                                         <#assign liked = (initiative.likedByMe?? && initiative.likedByMe)>
                                         <button type="submit"
                                                 class="btn ${liked?then('btn-primary','btn-outline-primary')}"
@@ -105,7 +105,7 @@
                                         </button>
                                     </form>
 
-                                    <a href="/initiative/${initiative.initiativeId}" class="btn btn-outline-secondary">
+                                    <a href="${contextPath}/initiative/${initiative.initiativeId}" class="btn btn-outline-secondary">
                                         Перейти к инициативе
                                     </a>
                                 </div>

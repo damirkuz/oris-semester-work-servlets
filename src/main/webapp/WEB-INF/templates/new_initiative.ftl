@@ -9,7 +9,7 @@
     <div class="new-initiative-container">
         <header class="page-header">
             <h1 class="page-title">Опубликовать инициативу</h1>
-            <a href="/" class="back-link">← Вернуться к ленте</a>
+            <a href="${contextPath}/" class="back-link">← Вернуться к ленте</a>
         </header>
 
         <#-- Показ ошибок сервера -->
@@ -27,7 +27,7 @@
 
         <form id="initiativeForm"
               class="initiative-form"
-              action="/new-initiative"
+              action="${contextPath}/new-initiative"
               method="post"
               enctype="multipart/form-data"
               novalidate>
@@ -72,7 +72,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn primary">Опубликовать</button>
-                <a href="/" class="btn outline">Отмена</a>
+                <a href="${contextPath}/" class="btn outline">Отмена</a>
             </div>
         </form>
 

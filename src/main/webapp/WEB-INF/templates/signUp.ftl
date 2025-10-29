@@ -6,7 +6,7 @@
 <#macro content>
     <div class="register-card">
         <h2 class="register-title">Регистрация</h2>
-        <form action="/signUp" method="post">
+        <form action="${contextPath}/signUp" method="post">
             <div class="input-wrapper">
                 <label for="name">Имя</label>
                 <input type="text" id="name" name="name" class="input-blue" required>
@@ -32,7 +32,7 @@
         $('#login-input').on('input', function () {
             submit.disabled = false;
             const value = this.value;
-            $.get('/user/check', {login: value}, function (response) {
+            $.get('${contextPath}/user/check', {login: value}, function (response) {
                 $('#login-error').text(response);
 
                 // disable submit button
