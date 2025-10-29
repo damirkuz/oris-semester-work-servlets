@@ -36,7 +36,8 @@ public class CommentServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.atInfo().log("Получаем id комментария из строки");
-        int commentId = Integer.parseInt(UrlUtil.getUrlAfterSlash(req, resp, 1).split("/")[0]);
+        Integer commentId = UrlUtil.parseIdOr404(req, resp);
+        if (commentId == null) {return;}
 
         String userAction = UrlUtil.getUrlAfterSlash(req, resp, 2); // for example: edit
 

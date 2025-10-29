@@ -1,11 +1,15 @@
 package ru.kuzdikenov.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.kuzdikenov.dto.CommentOnInitiative;
 import ru.kuzdikenov.entity.*;
 import ru.kuzdikenov.exception.*;
 import ru.kuzdikenov.helper.InitiativeUtil;
+import ru.kuzdikenov.helper.LoginPasswordUtil;
 import ru.kuzdikenov.repository.*;
 import ru.kuzdikenov.service.InitiativeService;
+import ru.kuzdikenov.servlet.InitiativeServlet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +20,8 @@ public class InitiativeServiceImpl implements InitiativeService {
     private final ImageRepository imageRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(InitiativeServiceImpl.class);
 
     public InitiativeServiceImpl(InitiativeRepository initiativeRepository, UserRepository userRepository, ImageRepository imageRepository, CommentRepository commentRepository, LikeRepository likeRepository) {
         this.initiativeRepository = initiativeRepository;
@@ -47,8 +53,7 @@ public class InitiativeServiceImpl implements InitiativeService {
     }
 
     @Override
-    public Initiative getById(String id, String requesterUserLogin) throws InitiativeNotFoundInDatabaseException {
-        int initiativeId = Integer.parseInt(id);
+    public Initiative getById(int initiativeId, String requesterUserLogin) throws InitiativeNotFoundInDatabaseException {
         Initiative initiative = initiativeRepository.getById(initiativeId);;
 
 
@@ -123,6 +128,41 @@ public class InitiativeServiceImpl implements InitiativeService {
     @Override
     public void delete(int initiativeId) throws InitiativeNotFoundInDatabaseException {
         initiativeRepository.delete(initiativeId);
+    }
+
+    @Override
+    public void edit(int initiativeId, String title, String body, List<Image> images, InitiativeStatus status) throws InitiativeNotFoundInDatabaseException, NoChangesException {
+        int changesCount = 0;
+        Initiative initiative = initiativeRepository.getById(initiativeId);
+
+
+        log.atInfo().log("Проверяем новый заголовок инициативы на совпадение со старым");
+        if (!title.equals(initiative.getTitle())) {
+            initiativeRepository.changeTitle(initiative, title);
+            changesCount++;
+        }
+
+        log.atInfo().log("Проверяем новое тело инициативы на совпадение со старым");
+        if (!body.equals(initiative.getBody())) {
+            initiativeRepository.changeBody(initiative, body);
+            changesCount++;
+        }
+
+        log.atInfo().log("Проверяем новый статус инициативы на совпадение со старым");
+        if (!status.equals(initiative.getStatus())) {
+            initiativeRepository.changeStatus(initiative, status);
+            changesCount++;
+        }
+
+        log.atInfo().log("Проверяем новые фото инициативы на совпадение со старым");
+        if (!images.equals(initiative.getImages())) {
+            initiativeRepository.changeImages(initiative, images);
+            changesCount++;
+        }
+
+        if (changesCount == 0) {
+            throw new NoChangesException();
+        }
     }
 
 }

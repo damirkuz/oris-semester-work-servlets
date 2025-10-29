@@ -6,6 +6,7 @@ import ru.kuzdikenov.dto.UuidAndLoginAndPath;
 import ru.kuzdikenov.entity.Image;
 import ru.kuzdikenov.exception.*;
 import ru.kuzdikenov.helper.ImageUtil;
+import ru.kuzdikenov.helper.InitiativeUtil;
 import ru.kuzdikenov.service.ImageService;
 import ru.kuzdikenov.service.InitiativeService;
 import ru.kuzdikenov.service.UserService;
@@ -60,9 +61,7 @@ public class NewInitiativeServlet extends HttpServlet {
         String initiativeTitle = req.getParameter("title");
         String body = req.getParameter("description");
 
-        List<Image> images = getImagesFromForm(req, resp);
-
-
+        List<Image> images = InitiativeUtil.getImagesFromForm(imageService, req, resp);
 
         try {
             int initiativeId = initiativeService.save(userLoginFromSession, initiativeTitle, body, images);
@@ -73,29 +72,5 @@ public class NewInitiativeServlet extends HttpServlet {
         } catch (FailInitiativeSaveException e) {
             resp.sendRedirect(req.getContextPath() + "/new-initiative/" + "?error=failInitiativeSave");
         }
-    }
-
-    private List<Image> getImagesFromForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Image> result = new ArrayList<>();
-
-        try {
-            List<UuidAndLoginAndPath> images = ImageUtil.handlePhotosAndSaveToCloudinary(req, "photos");
-            for (UuidAndLoginAndPath u : images) {
-                imageService.save(u.uuid(), u.login(), u.path());
-                result.add(imageService.getByUuid(u.uuid()));
-            }
-            log.atInfo().log("Фотографии успешно обработаны");
-        } catch (InvalidImageExtensionException e) {
-            resp.sendRedirect(req.getContextPath() + "/new-initiative/" + "?error=invalidImageExtension");
-        } catch (InvalidImageSizeException e) {
-            resp.sendRedirect(req.getContextPath() + "/new-initiative/" + "?error=invalidImageSize");
-        } catch (InvalidImageNameException e) {
-            resp.sendRedirect(req.getContextPath() + "/new-initiative/" + "?error=invalidImageName");
-        } catch (IOException e) {
-            log.atError().log("Не удалось создать директории");
-            throw new RuntimeException(e);
-        }
-
-        return result;
     }
 }

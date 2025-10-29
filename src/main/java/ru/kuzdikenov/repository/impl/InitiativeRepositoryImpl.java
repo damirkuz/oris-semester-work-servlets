@@ -90,8 +90,7 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
             ps.execute();
         } catch (SQLException e) {
             log.atError().log("Ошибка при удалении инициативы " + initiativeId);
-            throw new RuntimeException(e);
-//            throw new InitiativeNotFoundInDatabaseException();
+            throw new InitiativeNotFoundInDatabaseException();
         }
     }
 
@@ -127,19 +126,57 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
 
     }
 
+    private void updateOneColumnValue(Initiative initiative, String columnName, Object value, boolean isStringParameter) {
+        String sql = "UPDATE forum.initiative SET " + columnName + " = ? WHERE id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            if (isStringParameter) {
+                ps.setString(1, (String) value);
+            } else {
+                ps.setObject(1, value);
+            }
+
+            ps.setInt(2, initiative.getInitiativeId());
+            ps.execute();
+        } catch (SQLException e) {
+            log.atError().log(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void changeTitle(Initiative initiative, String newTitle) {
-
+        log.atInfo().log("Меняем заголовок инициативы с " + initiative.getTitle() + " на " + newTitle);
+        updateOneColumnValue(initiative, "title", newTitle, true);
+        log.atInfo().log("Заголовок инициативы " + initiative.getInitiativeId() + " изменён");
     }
 
     @Override
     public void changeBody(Initiative initiative, String newBody) {
-
+        log.atInfo().log("Меняем тело инициативы с " + initiative.getBody() + " на " + newBody);
+        updateOneColumnValue(initiative, "body", newBody, true);
+        log.atInfo().log("Тело инициативы " + initiative.getInitiativeId() + " изменено");
     }
 
     @Override
     public void changeStatus(Initiative initiative, InitiativeStatus initiativeStatus) {
+        log.atInfo().log("Меняем статус инициативы с " + initiative.getStatus() + " на " + initiativeStatus);
+        updateOneColumnValue(initiative, "status", initiativeStatus.getValue(), true);
+        log.atInfo().log("Статус инициативы " + initiative.getInitiativeId() + " изменён");
+    }
 
+    @Override
+    public void changeImages(Initiative initiative, List<Image> images) {
+        log.atInfo().log("Меняю изображения инициативы " + initiative.getInitiativeId());
+        try {
+            DatabaseUtil.withTransaction(dataSource, connection -> {
+                setImages(connection, initiative.getInitiativeId(), images);
+                return 0;
+            });
+        } catch (SQLException e) {
+            log.atError().log(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

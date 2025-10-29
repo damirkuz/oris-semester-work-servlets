@@ -84,6 +84,7 @@
                         <#if (RequestParameters.error??)>
                             <div class="error-message">
                                 <#if RequestParameters.error == "nonAuthorizedUser">Авторизуйтесь, чтобы взаимодействовать с инициативой</#if>
+                                <#if RequestParameters.error == "deleteInitiativeError">Произошла ошибка при удалении инициативы</#if>
                             </div>
                         </#if>
 

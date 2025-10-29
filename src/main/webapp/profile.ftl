@@ -83,32 +83,5 @@
                 }
             });
         </script>
-
-        <div class="profile-stats">
-            <h2>Статистика пользователя</h2>
-            <ul>
-                <li><strong>Дата регистрации:</strong>
-                    <span id="registration-date">${userProfile.registrationDate!}</span>
-                </li>
-                <li><strong>Количество инициатив:</strong> ${userProfile.initiativesCount}</li>
-                <li><strong>Завершённых проектов:</strong> ${userProfile.completedProjects}</li>
-            </ul>
-        </div>
-
-        <div class="user-posts">
-            <h2>Мои публикации</h2>
-            <#if userProfile.posts?? && userProfile.posts?has_content>
-                <#list userProfile.posts as post>
-                    <div class="post-card">
-                        <h3 class="post-title">${post.title}</h3>
-                        <p class="post-content">${post.content}</p>
-                        <p class="post-date">Опубликовано: ${post.publishedDate}</p>
-                    </div>
-                </#list>
-            <#else>
-                <p>Публикаций пока нет.</p>
-            </#if>
-        </div>
-
     </div>
 </#macro>
