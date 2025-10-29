@@ -99,11 +99,29 @@
                                 </button>
                             </form>
 
-                            <#if canEditInitiative?? && canEditInitiative>
+                            <#if isSelfUserInitiative?? && isSelfUserInitiative>
                                 <a href="/initiative/${initiative.initiativeId}/edit" class="btn btn-outline-secondary">
                                     Редактировать инициативу
                                 </a>
+                                <button id="deleteBtn" class="btn btn-outline-secondary">
+                                    Удалить инициативу
+                                </button>
                             </#if>
+
+                            <script>
+                                // send delete request on button
+                                document.getElementById('deleteBtn').addEventListener('click', async (e) => {
+                                    const id = e.currentTarget.dataset.id;
+                                    const res = await fetch(`/initiative/${initiative.initiativeId}`, {
+                                        method: 'DELETE',
+                                        headers: { 'Accept': 'application/json' }
+                                    });
+                                    alert("Инициатива удалена");
+                                    window.location.href = '/';
+
+                                });
+                            </script>
+
                         </div>
 
                         <section aria-labelledby="comments-title">

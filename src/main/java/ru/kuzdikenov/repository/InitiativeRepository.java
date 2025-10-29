@@ -11,7 +11,7 @@ import java.util.List;
 public interface InitiativeRepository {
     int save(Initiative initiative) throws FailInitiativeSaveException;
     List<Initiative> getAllFromUser(User user);
-    void delete(Initiative initiative);
+    void delete(int initiativeId) throws InitiativeNotFoundInDatabaseException;
     Initiative getById(int initiativeId) throws InitiativeNotFoundInDatabaseException;
     void changeTitle(Initiative initiative, String newTitle);
     void changeBody(Initiative initiative, String newBody);

@@ -78,8 +78,21 @@ public class InitiativeRepositoryImpl implements InitiativeRepository {
     }
 
     @Override
-    public void delete(Initiative initiative) {
+    public void delete(int initiativeId) throws InitiativeNotFoundInDatabaseException {
+        log.atInfo().log("Удаляем инициативу " + initiativeId);
 
+        String sql = "DELETE FROM forum.initiative WHERE id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, initiativeId);
+
+            ps.execute();
+        } catch (SQLException e) {
+            log.atError().log("Ошибка при удалении инициативы " + initiativeId);
+            throw new RuntimeException(e);
+//            throw new InitiativeNotFoundInDatabaseException();
+        }
     }
 
     @Override

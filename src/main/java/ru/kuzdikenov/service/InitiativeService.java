@@ -15,4 +15,5 @@ public interface InitiativeService {
     boolean checkExists(int initiativeId);
     void like(String userLogin, int initiativeId) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException;
     void comment(String userLogin, int initiativeId, String body) throws InitiativeNotFoundInDatabaseException, UserNotFoundInDatabaseException;
+    void delete(int initiativeId) throws InitiativeNotFoundInDatabaseException;
 }

@@ -111,4 +111,24 @@ public class InitiativeServlet extends HttpServlet {
             default: return; // 404
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        log.atInfo().log("Получаем логин пользователя из строки");
+        int initiativeId = Integer.parseInt(UrlUtil.getUrlAfterSlash(req, resp, 1).split("/")[0]);
+
+        String userLoginFromSession = (String) req.getSession().getAttribute("login");
+
+        if (userLoginFromSession == null) {
+            log.atError().log("Неавторизованный пользователь пытается взаимодействовать с инициативой");
+            resp.sendRedirect(req.getContextPath() + "/initiative/" + initiativeId + "?error=nonAuthorizedUser");
+            return;
+        }
+
+        try {
+            initiativeService.delete(initiativeId);
+        } catch (InitiativeNotFoundInDatabaseException e) {
+            resp.sendRedirect(req.getContextPath() + "/initiative/" + initiativeId + "?error=deleteInitiativeError");
+        }
+    }
 }

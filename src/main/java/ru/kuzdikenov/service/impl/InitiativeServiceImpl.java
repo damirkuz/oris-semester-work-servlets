@@ -120,4 +120,9 @@ public class InitiativeServiceImpl implements InitiativeService {
         commentRepository.save(comment);
     }
 
+    @Override
+    public void delete(int initiativeId) throws InitiativeNotFoundInDatabaseException {
+        initiativeRepository.delete(initiativeId);
+    }
+
 }
