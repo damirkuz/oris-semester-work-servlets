@@ -10,6 +10,8 @@
 
     <!-- Bootstrap 5 JS bundle-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
 
