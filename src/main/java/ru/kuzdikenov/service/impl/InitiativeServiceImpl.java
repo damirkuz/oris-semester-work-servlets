@@ -6,6 +6,7 @@ import ru.kuzdikenov.dto.CommentOnInitiative;
 import ru.kuzdikenov.entity.*;
 import ru.kuzdikenov.exception.*;
 import ru.kuzdikenov.helper.InitiativeUtil;
+import ru.kuzdikenov.helper.LoginPasswordUtil;
 import ru.kuzdikenov.repository.*;
 import ru.kuzdikenov.service.InitiativeService;
 
@@ -139,6 +140,10 @@ public class InitiativeServiceImpl implements InitiativeService {
 
         log.atInfo().log("Проверяем новый заголовок инициативы на совпадение со старым");
         if (!title.equals(initiative.getTitle())) {
+            if (!InitiativeUtil.isValidTitle(title)) {
+                throw new NoChangesException();
+            }
+
             initiativeRepository.changeTitle(initiative, title);
             changesCount++;
         }

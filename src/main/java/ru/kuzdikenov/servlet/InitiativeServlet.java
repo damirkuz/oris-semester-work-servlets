@@ -136,7 +136,6 @@ public class InitiativeServlet extends HttpServlet {
                 } catch (NoChangesException e) {
                     log.atError().log("Инициатива " + initiativeId + " не была изменена");
                     resp.sendRedirect(req.getContextPath() + "/initiative/" + initiativeId);
-                    throw new RuntimeException(e);
                 } catch (InitiativeNotFoundInDatabaseException e) {
                     sendNotFound(resp);
                 }
