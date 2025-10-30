@@ -1,3 +1,4 @@
+<#-- profile.ftl -->
 <#include "base.ftl">
 
 <#macro title>Личный кабинет</#macro>

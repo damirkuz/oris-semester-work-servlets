@@ -20,7 +20,6 @@ import javax.servlet.annotation.WebListener;
 public class AppContextListener implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent sce) {
-        // TODO: написать зависимости
         UserRepository userRepository = new UserRepositoryImpl();
         ImageRepository imageRepository = new ImageRepositoryImpl();
         InitiativeRepository initiativeRepository = new InitiativeRepositoryImpl();

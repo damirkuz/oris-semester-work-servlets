@@ -1,8 +1,11 @@
+<#-- initiative.ftl -->
 <#include "base.ftl">
 
 <#macro title>Инициатива</#macro>
 
 <#macro content>
+    <script src="${contextPath}/static/js/date_utils.js"></script>
+
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-10">

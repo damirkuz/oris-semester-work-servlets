@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
         }
 
-        // TODO: реализовать логику получения статистики по количеству инициатив
+
         int initiativesCount = 0;
         int completedProjects = 0;
         List<Initiative> initiatives = null;

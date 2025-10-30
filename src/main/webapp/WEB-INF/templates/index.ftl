@@ -1,8 +1,11 @@
+<#-- index.ftl -->
 <#include "base.ftl">
 
 <#macro title>Лента инициатив</#macro>
 
 <#macro content>
+    <script src="${contextPath}/static/js/date_utils.js"></script>
+
     <div class="container py-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h1 class="h3 text-primary m-0">Лента инициатив</h1>

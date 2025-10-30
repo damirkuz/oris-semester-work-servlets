@@ -1,3 +1,4 @@
+<#-- error404.ftl -->
 <#include "base.ftl">
 
 <#macro title>Страница не найдена (404)</#macro>

@@ -16,5 +16,4 @@ public interface UserRepository {
     void changeProfilePicture(User user, UUID imageId);
     void changeUserRole(User user, UserRole userRole);
     void delete(User user);
-    // TODO: метод, получающий данные для статистики личного кабинета пользователя
 }

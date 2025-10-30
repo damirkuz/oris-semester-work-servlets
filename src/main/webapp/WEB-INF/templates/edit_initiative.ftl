@@ -1,3 +1,4 @@
+<#-- edit_initiative.ftl -->
 <#include "base.ftl">
 
 <#macro title>Редактировать инициативу</#macro>

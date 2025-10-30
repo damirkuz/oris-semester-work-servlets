@@ -1,3 +1,4 @@
+<#-- new_initiative.ftl -->
 <#include "base.ftl">
 
 <#macro title>Новая инициатива</#macro>
