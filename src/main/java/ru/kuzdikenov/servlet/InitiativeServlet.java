@@ -47,6 +47,16 @@ public class InitiativeServlet extends HttpServlet {
         Integer initiativeId = UrlUtil.parseIdOr404(req, resp);
         if (initiativeId == null) return;
 
+        String sessionLogin = (String) req.getSession().getAttribute("login");
+
+        boolean isAdmin = false;
+        try {
+            isAdmin = userService.getByLogin(sessionLogin).getUserRole().equals(UserRole.ADMIN);
+        } catch (UserNotFoundInDatabaseException e) {
+        }
+
+        req.setAttribute("isAdmin", isAdmin);
+
         String userAction = UrlUtil.getUrlAfterSlash(req, resp, 2); // for example: edit
         if (userAction != null && userAction.equals("edit")) {
             getEditPage(initiativeId, req, resp);
@@ -54,7 +64,6 @@ public class InitiativeServlet extends HttpServlet {
         }
 
 
-        String sessionLogin = (String) req.getSession().getAttribute("login");
         Initiative initiative = InitiativeUtil.loadInitiativeOr404(initiativeId, sessionLogin, initiativeService, resp);
         if (initiative == null) return;
 
@@ -74,13 +83,7 @@ public class InitiativeServlet extends HttpServlet {
         if (initiative == null) return;
 
         boolean isSelf = InitiativeUtil.isSelfInitiative(initiative, sessionLogin, userService);
-        boolean isAdmin = false;
-        try {
-            isAdmin = userService.getByLogin(sessionLogin).getUserRole().equals(UserRole.ADMIN);
-        } catch (UserNotFoundInDatabaseException e) {
-        }
 
-        req.setAttribute("isAdmin", isAdmin);
         req.setAttribute("initiative", initiative);
         req.setAttribute("initiativeStatuses", InitiativeStatus.values());
         req.getRequestDispatcher("/edit_initiative.ftl").forward(req, resp);
@@ -123,8 +126,8 @@ public class InitiativeServlet extends HttpServlet {
                 try {
                     String title = req.getParameter("title");
                     String body = req.getParameter("description");
-                    System.out.println(req.getParameter("status"));
-                    InitiativeStatus status = InitiativeStatus.valueOf(req.getParameter("status"));
+                    String statusParam = req.getParameter("status");
+                    InitiativeStatus status = statusParam == null ? InitiativeStatus.SUGGESTED : InitiativeStatus.valueOf(statusParam);
                     List<Image> images = InitiativeUtil.getImagesFromForm(imageService, req, resp);
 
                     initiativeService.edit(initiativeId, title, body, images, status);

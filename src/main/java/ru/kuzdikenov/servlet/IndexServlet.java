@@ -25,7 +25,9 @@ public class IndexServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Initiative> initiatives = initiativeService.getAll();
+        // sorted desc
+        List<Initiative> initiatives = initiativeService.getAll().stream()
+                .sorted((in1, in2) -> - in1.getCreatedAt().compareTo(in2.getCreatedAt())).toList();
         req.setAttribute("initiatives", initiatives);
         req.getRequestDispatcher("/index.ftl").forward(req, resp);
     }

@@ -80,7 +80,7 @@
                                 </button>
                             </form>
 
-                            <#if isSelfUserInitiative?? && isSelfUserInitiative>
+                            <#if (isSelfUserInitiative?? && isSelfUserInitiative) || (isAdmin?? && isAdmin)>
                                 <a href="${contextPath}/initiative/${initiative.initiativeId}/edit" class="btn btn-outline-secondary">
                                     Редактировать инициативу
                                 </a>

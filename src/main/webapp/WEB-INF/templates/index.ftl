@@ -88,7 +88,7 @@
                                 </#if>
 
                                 <div class="d-flex flex-wrap align-items-center gap-2">
-                                    <#-- Лайк -->
+                                    <#-- like -->
                                     <form action="${contextPath}/initiative/${initiative.initiativeId}/like" method="post" class="m-0">
                                         <#assign liked = (initiative.likedByMe?? && initiative.likedByMe)>
                                         <button type="submit"

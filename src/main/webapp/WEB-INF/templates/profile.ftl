@@ -13,7 +13,7 @@
                 <#if userProfile.profilePicture?? && userProfile.profilePicture?has_content>
                     <img src="${userProfile.profilePicture}" alt="Аватар пользователя" class="avatar-img" />
                 <#else>
-                    <img src="/static/images/default-avatar.png" alt="Стандартный аватар" class="avatar-img" />
+                    <img src="${contextPath}/static/images/default-avatar.png" alt="Стандартный аватар" class="avatar-img" />
                 </#if>
             </div>
 

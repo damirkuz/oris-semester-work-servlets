@@ -6,10 +6,8 @@ import ru.kuzdikenov.dto.CommentOnInitiative;
 import ru.kuzdikenov.entity.*;
 import ru.kuzdikenov.exception.*;
 import ru.kuzdikenov.helper.InitiativeUtil;
-import ru.kuzdikenov.helper.LoginPasswordUtil;
 import ru.kuzdikenov.repository.*;
 import ru.kuzdikenov.service.InitiativeService;
-import ru.kuzdikenov.servlet.InitiativeServlet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,15 +66,18 @@ public class InitiativeServiceImpl implements InitiativeService {
     private List<CommentOnInitiative> getCommentsOnInitiative(List<Comment> comments, String requesterUserLogin) {
         List<CommentOnInitiative> commentsOnInitiative = new ArrayList<>();
         for (Comment comment: comments) {
-            String authorUserLogin;
+            String authorUserLogin = null;
+            String authorName = null;
             try {
-                authorUserLogin = userRepository.getById(comment.getAuthorUserId()).getLogin();
+                User author = userRepository.getById(comment.getAuthorUserId());
+                authorUserLogin = author.getLogin();
+                authorName = author.getName();
             } catch (UserNotFoundInDatabaseException e) {
-                authorUserLogin = null; // in db always have correct user id
             }
 
             boolean ownedByMe = authorUserLogin.equals(requesterUserLogin);
-            commentsOnInitiative.add(new CommentOnInitiative(comment.getId(), authorUserLogin, comment.getBody(), ownedByMe));
+
+            commentsOnInitiative.add(new CommentOnInitiative(comment.getId(), authorName, comment.getBody(), ownedByMe));
         }
         return commentsOnInitiative;
     }
