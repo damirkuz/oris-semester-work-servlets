@@ -19,6 +19,7 @@ services:
     labels:
       - "traefik.enable=true"
       # Правило маршрутизации: Хост + Путь
+      - "traefik.http.routers.forum.rule=(Host(`${DOMAIN}`) || Host(`${IP_HOST}`)) && PathPrefix(`/${CONTEXT_NAME}`)"
       - "traefik.http.routers.forum.rule=Host(`${DOMAIN}`) && PathPrefix(`/${CONTEXT_NAME}`)"
       - "traefik.http.routers.forum.entrypoints=websecure"
       - "traefik.http.routers.forum.tls.certresolver=myresolver"
