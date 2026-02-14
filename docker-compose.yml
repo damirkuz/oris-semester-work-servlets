@@ -20,8 +20,7 @@ services:
       - "traefik.enable=true"
       # Правило маршрутизации: Хост + Путь
       - "traefik.http.routers.forum.rule=(Host(`${DOMAIN}`) || Host(`${IP_HOST}`)) && PathPrefix(`/${CONTEXT_NAME}`)"
-      - "traefik.http.routers.forum.rule=Host(`${DOMAIN}`) && PathPrefix(`/${CONTEXT_NAME}`)"
-      - "traefik.http.routers.forum.entrypoints=websecure"
+      - "traefik.http.routers.forum.entrypoints=web,websecure"
       - "traefik.http.routers.forum.tls.certresolver=myresolver"
       # Связываем роутер с сервисом (используем статическое имя, чтобы не было путаницы)
       - "traefik.http.routers.forum.service=forum"
