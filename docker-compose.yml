@@ -9,10 +9,23 @@ services:
       context: .
       args:
         CONTEXT_NAME: ${CONTEXT_NAME}
-    ports:
+    # ports:
       # перенаправляем порт из контейнера в компьютер
       # "порт компьютера:порт контейнера"
-      - "8080:8080"
+      # - "8080:8080"
+    networks:
+      - web_network
+      - default        # чтобы видеть свою БД в локальной сети
+    labels:
+      - "traefik.enable=true"
+      # Правило маршрутизации: Хост + Путь
+      - "traefik.http.routers.forum.rule=Host(`${DOMAIN}`) && PathPrefix(`/${CONTEXT_NAME}`)"
+      - "traefik.http.routers.forum.entrypoints=websecure"
+      - "traefik.http.routers.forum.tls.certresolver=myresolver"
+      # Связываем роутер с сервисом
+      - "traefik.http.routers.forum.service=forum"
+      # Настраиваем сервис (порт контейнера)
+      - "traefik.http.services.forum.loadbalancer.server.port=8080"
     # контейнер app запустится только после запуска контейнера db
     # при этом мы не ждём пока бд будет готова к работе
     depends_on:
@@ -24,7 +37,7 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      cloudinary_api_key: ${cloudinary_cloud_name}
+      cloudinary_api_key: ${cloudinary_api_key}
       cloudinary_api_secret: ${cloudinary_api_secret}
       cloudinary_cloud_name: ${cloudinary_cloud_name}
 
@@ -33,14 +46,14 @@ services:
     image: postgres:15
     restart: always
     container_name: oris_semester_work1_servlets_forum
+    networks:
+      - default
     environment:
       # автоматически создаёт базу данных и пользователя, который ей владеет
       # переменные подставляются из .env
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5433:5432"
     # описываем как идёт проверка условия service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
@@ -71,6 +84,10 @@ services:
       FLYWAY_BASELINE_VERSION: 1
       FLYWAY_BASELINE_DESCRIPTION: "Initial baseline"
       FLYWAY_SCHEMAS: public
+
+networks:
+  web_network:
+    external: true
 
 volumes:
   pg_data:
