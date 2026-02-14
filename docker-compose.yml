@@ -1,0 +1,76 @@
+version: "3.9"
+
+# тут пишутся контейнеры, которые создаём
+services:
+  # выбираем название
+  app:
+    # пишем путь, где находится dockerfile относительно compose-файла
+    build:
+      context: .
+      args:
+        CONTEXT_NAME: ${CONTEXT_NAME}
+    ports:
+      # перенаправляем порт из контейнера в компьютер
+      # "порт компьютера:порт контейнера"
+      - "8080:8080"
+    # контейнер app запустится только после запуска контейнера db
+    # при этом мы не ждём пока бд будет готова к работе
+    depends_on:
+      db:
+        # ставим условие, что контейнер app запустится после того как база будет готова к работе
+        condition: service_healthy
+    # закидываем переменные окружения в приложение
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      cloudinary_api_key: ${cloudinary_cloud_name}
+      cloudinary_api_secret: ${cloudinary_api_secret}
+      cloudinary_cloud_name: ${cloudinary_cloud_name}
+
+  db:
+    # используем готовый образ для постгреса
+    image: postgres:15
+    restart: always
+    container_name: oris_semester_work1_servlets_forum
+    environment:
+      # автоматически создаёт базу данных и пользователя, который ей владеет
+      # переменные подставляются из .env
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    # описываем как идёт проверка условия service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # создаёт на устройстве место, где будет храниться бд
+    # иначе каждый раз контейнер будет создавать новую бд
+    volumes:
+      # подменяет этот путь (на нём хранит свои данные постгрес внутри контейнера)
+      # путем нашего volume хранилища
+      - pg_data:/var/lib/postgresql/data
+
+
+  flyway:
+    image: flyway/flyway
+    depends_on:
+      - db
+    command:
+      - "migrate"
+      - "-baselineOnMigrate=true"
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      FLYWAY_USER: ${DB_USER}
+      FLYWAY_PASSWORD: ${DB_PASSWORD}
+      FLYWAY_BASELINE_VERSION: 1
+      FLYWAY_BASELINE_DESCRIPTION: "Initial baseline"
+      FLYWAY_SCHEMAS: public
+
+volumes:
+  pg_data:
