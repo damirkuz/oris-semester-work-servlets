@@ -9,7 +9,7 @@ services:
       context: .
       args:
         CONTEXT_NAME: ${CONTEXT_NAME}
-    # ports:
+      # ports:
       # перенаправляем порт из контейнера в компьютер
       # "порт компьютера:порт контейнера"
       # - "8080:8080"
@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.forum.rule=Host(`${DOMAIN}`) && PathPrefix(`/${CONTEXT_NAME}`)"
       - "traefik.http.routers.forum.entrypoints=websecure"
       - "traefik.http.routers.forum.tls.certresolver=myresolver"
-      # Связываем роутер с сервисом
+      # Связываем роутер с сервисом (используем статическое имя, чтобы не было путаницы)
       - "traefik.http.routers.forum.service=forum"
       # Настраиваем сервис (порт контейнера)
       - "traefik.http.services.forum.loadbalancer.server.port=8080"
@@ -37,6 +37,7 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      # Исправлена опечатка: значение берется из api_key, а не из cloud_name
       cloudinary_api_key: ${cloudinary_api_key}
       cloudinary_api_secret: ${cloudinary_api_secret}
       cloudinary_cloud_name: ${cloudinary_cloud_name}
@@ -71,7 +72,11 @@ services:
   flyway:
     image: flyway/flyway
     depends_on:
-      - db
+      db:
+        # ждём применения миграций
+        condition: service_healthy
+    networks:
+      - default
     command:
       - "migrate"
       - "-baselineOnMigrate=true"
