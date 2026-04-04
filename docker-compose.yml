@@ -37,7 +37,6 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      # Исправлена опечатка: значение берется из api_key, а не из cloud_name
       cloudinary_api_key: ${cloudinary_api_key}
       cloudinary_api_secret: ${cloudinary_api_secret}
       cloudinary_cloud_name: ${cloudinary_cloud_name}
